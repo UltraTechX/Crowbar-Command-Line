@@ -15,6 +15,7 @@ Feel free to open an issue ticket and I will respond when I can.
 
 ## Credits
 Credit to ZeqMacaw [(Profile can be found here)](https://steamcommunity.com/id/zeqmacaw) for creating Crowbar and developing/providing the source code that this project is based off of.
+Credit to Rainyan for fixing VS compilation.
 [If you would like a GUI version of this program, the original Crowbar program and main steam group can be found here.](https://steamcommunity.com/groups/CrowbarTool)
 
 Credit to myself aswell for adding the ability to work off command line arguments. [My profile can be found here](https://steamcommunity.com/id/okfay)
