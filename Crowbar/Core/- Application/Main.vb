@@ -1,3 +1,5 @@
+Imports System.IO
+
 Module Main
 
 	' Entry point of application.
@@ -26,8 +28,13 @@ Module Main
         '	Win32Api.PostMessage(CType(Win32Api.WindowsMessages.HWND_BROADCAST, IntPtr), appUniqueWindowsMessageIdentifier, IntPtr.Zero, IntPtr.Zero)
         'Else
         'NOTE: Use the Windows Vista and later visual styles (such as rounded buttons).
+        'Application.EnableVisualStyles()
+        'NOTE: Needed for keeping Label and Button text rendering correctly.
+        'Application.SetCompatibleTextRenderingDefault(False)
 
-        TheApp = New App()
+        AddHandler AppDomain.CurrentDomain.AssemblyResolve, AddressOf ResolveAssemblies
+
+		TheApp = New App()
 		'Try
 		TheApp.Init()
 		If TheApp.Settings.AppIsSingleInstance Then
@@ -45,10 +52,31 @@ Module Main
 		Return 0
 	End Function
 
-    Private Sub StartupNextInstanceEventHandler(ByVal sender As Object, ByVal e As SingleInstanceEventArgs)
-    End Sub
+	Private Sub StartupNextInstanceEventHandler(ByVal sender As Object, ByVal e As SingleInstanceEventArgs)
+		If e.MainForm.WindowState = FormWindowState.Minimized Then
+			e.MainForm.WindowState = FormWindowState.Normal
+		End If
+		e.MainForm.Activate()
+		CType(e.MainForm, MainForm).Startup(e.CommandLine)
+	End Sub
 
-    'Public TheJob As WindowsJob
-    Public TheApp As App
+	Private Function ResolveAssemblies(sender As Object, e As System.ResolveEventArgs) As Reflection.Assembly
+		Dim desiredAssembly As Reflection.AssemblyName = New Reflection.AssemblyName(e.Name)
+		'If desiredAssembly.Name = "SevenZipSharp" Then
+		'	Return Reflection.Assembly.Load(My.Resources.SevenZipSharp)
+		'ElseIf desiredAssembly.Name = "Steamworks.NET" Then
+		'	Return Reflection.Assembly.Load(My.Resources.Steamworks_NET)
+		'Else
+		'	Return Nothing
+		'End If
+		If desiredAssembly.Name = "Steamworks.NET" Then
+			Return Reflection.Assembly.Load(My.Resources.Steamworks_NET)
+		Else
+			Return Nothing
+		End If
+	End Function
+
+	'Public TheJob As WindowsJob
+	Public TheApp As App
 
 End Module

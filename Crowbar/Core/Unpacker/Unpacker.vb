@@ -46,20 +46,23 @@ Public Class Unpacker
 		Me.RunWorkerAsync(info)
 	End Sub
 
-	Public Sub RunSynchronous(ByVal unpackerAction As ArchiveAction, ByVal archivePathFileNameToEntryIndexesMap As SortedList(Of String, List(Of Integer)))
+	Public Function RunSynchronous(ByVal unpackerAction As ArchiveAction, ByVal archivePathFileNameToEntryIndexesMap As SortedList(Of String, List(Of Integer))) As String
 		Me.theSynchronousWorkerIsActive = True
 		Dim info As New UnpackerInputInfo()
 		info.theArchiveAction = unpackerAction
 		info.theArchivePathFileNameToEntryIndexesMap = archivePathFileNameToEntryIndexesMap
+
+		Me.theRunSynchronousResultMessage = ""
 		Dim e As New System.ComponentModel.DoWorkEventArgs(info)
 		Me.OnDoWork(e)
-	End Sub
+		Return Me.theRunSynchronousResultMessage
+	End Function
 
 	Public Sub UnpackFolderTreeFromVPK(ByVal folderTreeToExtract As String)
 		Me.theSynchronousWorkerIsActive = True
 		Dim info As New UnpackerInputInfo()
 		info.theArchiveAction = ArchiveAction.ExtractFolderTree
-		info.theFolderTreeToExtract = folderTreeToExtract
+		info.theGamePath = folderTreeToExtract
 		Dim e As New System.ComponentModel.DoWorkEventArgs(info)
 		Me.OnDoWork(e)
 	End Sub
@@ -100,16 +103,18 @@ Public Class Unpacker
 	End Function
 
 	Public Sub DeleteTempUnpackFolder()
-		Try
-			For Each unpackedPath As String In Me.theUnpackedPaths
-				If unpackedPath IsNot Nothing AndAlso Directory.Exists(unpackedPath) Then
-					'TODO: Double-check that this is completely safe. Double-check that it won't delete a root folder.
-					My.Computer.FileSystem.DeleteDirectory(unpackedPath, FileIO.DeleteDirectoryOption.DeleteAllContents)
-				End If
-			Next
-		Catch ex As Exception
-			Dim debug As Integer = 4242
-		End Try
+		If Me.theUnpackedPathsAreInTempPath Then
+			Me.theUnpackedPathsAreInTempPath = False
+			Try
+				For Each unpackedPath As String In Me.theUnpackedPaths
+					If unpackedPath IsNot Nothing AndAlso Directory.Exists(unpackedPath) Then
+						Directory.Delete(unpackedPath, True)
+					End If
+				Next
+			Catch ex As Exception
+				Dim debug As Integer = 4242
+			End Try
+		End If
 	End Sub
 
 #End Region
@@ -122,16 +127,18 @@ Public Class Unpacker
 
 	Private Sub Unpacker_DoWork(ByVal sender As System.Object, ByVal e As System.ComponentModel.DoWorkEventArgs)
 		If Not Me.theSynchronousWorkerIsActive Then
+			'TODO: This indication that work has started in backgroundworker seems unimportant and should probably be removed.
 			Me.ReportProgress(0, "")
 		End If
 
 		Dim info As UnpackerInputInfo
 		info = CType(e.Argument, UnpackerInputInfo)
 
+		Me.theUnpackedPathsAreInTempPath = False
+
 		Dim status As AppEnums.StatusMessage
 		If info.theArchiveAction = ArchiveAction.ExtractFolderTree Then
-			'status = Me.Extract(info.theArchivePathFileNameToEntryIndexesMap)
-			'TODO: Similar to List then Extract.
+			status = Me.ExtractFolderTree(info.theGamePath)
 		Else
 			If Me.UnpackerInputsAreValid() Then
 				If info.theArchiveAction = ArchiveAction.List Then
@@ -142,7 +149,9 @@ Public Class Unpacker
 					'	status = Me.Extract(info.theArchivePathFileNameToEntryIndexesMap)
 				ElseIf info.theArchiveAction = ArchiveAction.ExtractAndOpen Then
 					status = Me.ExtractWithoutLogging(info.theArchivePathFileNameToEntryIndexesMap)
-					Me.StartFile(Path.Combine(Me.theOutputPath, Me.theUnpackedRelativePathFileNames(0)))
+					If status = StatusMessage.Success Then
+						Me.StartFile(Path.Combine(Me.theOutputPath, Me.theUnpackedRelativePathFileNames(0)))
+					End If
 				ElseIf info.theArchiveAction = ArchiveAction.ExtractToTemp Then
 					status = Me.ExtractWithoutLogging(info.theArchivePathFileNameToEntryIndexesMap)
 				End If
@@ -158,10 +167,12 @@ Public Class Unpacker
 		End If
 	End Sub
 
-	Private Function GetAdjustedOutputPath() As String
+	Private Function GetOutputPath() As String
 		Dim outputPath As String
 
-		If TheApp.Settings.UnpackOutputFolderOption = UnpackOutputPathOptions.Subfolder Then
+		If TheApp.Settings.UnpackOutputFolderOption = UnpackOutputPathOptions.SameFolder Then
+			outputPath = TheApp.Settings.UnpackOutputSamePath
+		ElseIf TheApp.Settings.UnpackOutputFolderOption = UnpackOutputPathOptions.Subfolder Then
 			If File.Exists(TheApp.Settings.UnpackPackagePathFolderOrFileName) Then
 				outputPath = Path.Combine(FileManager.GetPath(TheApp.Settings.UnpackPackagePathFolderOrFileName), TheApp.Settings.UnpackOutputSubfolderName)
 			ElseIf Directory.Exists(TheApp.Settings.UnpackPackagePathFolderOrFileName) Then
@@ -292,126 +303,156 @@ Public Class Unpacker
 		End If
 	End Sub
 
-	'Private Sub ExtractFolderTree()
-	'	Dim archivePathFileName As String
-	'	Dim archivePath As String = ""
-	'	archivePathFileName = TheApp.Settings.UnpackPackagePathFolderOrFileName
-	'	If File.Exists(archivePathFileName) Then
-	'		archivePath = FileManager.GetPath(archivePathFileName)
-	'	ElseIf Directory.Exists(archivePathFileName) Then
-	'		archivePath = archivePathFileName
-	'	End If
+	Private Function ExtractFolderTree(ByVal gamePath As String) As AppEnums.StatusMessage
+		Dim status As AppEnums.StatusMessage = StatusMessage.Success
 
-	'	Me.theArchivePathFileNameToFileDataMap = New SortedList(Of String, BasePackageFileData)()
+		' Example: 
+		'      Me.theGamePath = gamePath = "E:\Users\ZeqMacaw\Steam\steamapps\common\Half-Life 2\hl2"
+		'      gameRootPath              = "E:\Users\ZeqMacaw\Steam\steamapps\common\Half-Life 2"
+		Me.theGamePath = gamePath
+		Dim gameRootPath As String = FileManager.GetPath(gamePath)
 
-	'	Try
-	'		If TheApp.Settings.UnpackMode = InputOptions.FolderRecursion Then
-	'			Me.ExtractFolderTreeFromArchivesInFolderRecursively(archivePath)
-	'		ElseIf TheApp.Settings.UnpackMode = InputOptions.Folder Then
-	'			Me.ExtractFolderTreeFromArchivesInFolder(archivePath)
-	'		Else
-	'			Me.ExtractFolderTreeFromArchive(archivePathFileName)
-	'		End If
-	'	Catch ex As Exception
-	'		Dim debug As Integer = 4242
-	'	End Try
-	'End Sub
+		Try
+			Me.ExtractFolderTreeFromArchivesInFolderRecursively(gameRootPath)
+		Catch ex As Exception
+			status = StatusMessage.Error
+		End Try
 
-	'Private Sub ExtractFolderTreeFromArchivesInFolderRecursively(ByVal archivePath As String)
-	'	Me.ExtractFolderTreeFromArchivesInFolder(archivePath)
+		Return status
+	End Function
 
-	'	Try
-	'		For Each aPathSubFolder As String In Directory.GetDirectories(archivePath)
-	'			Me.ExtractFolderTreeFromArchivesInFolderRecursively(aPathSubFolder)
+	Private Function ExtractFolderTreeFromArchivesInFolderRecursively(ByVal packagePath As String) As AppEnums.StatusMessage
+		Dim status As AppEnums.StatusMessage = StatusMessage.Success
 
-	'			If Me.CancellationPending Then
-	'				Return
-	'			End If
-	'		Next
-	'	Catch ex As Exception
-	'		Dim debug As Integer = 4242
-	'	End Try
-	'End Sub
+		Me.ExtractFolderTreeFromArchivesInFolder(packagePath)
 
-	'Private Sub ExtractFolderTreeFromArchivesInFolder(ByVal archivePath As String)
-	'	Try
-	'		For Each anArchivePathFileName As String In Directory.GetFiles(archivePath, "*.vpk")
-	'			Me.ExtractFolderTreeFromArchive(anArchivePathFileName)
+		Try
+			For Each aPathSubFolder As String In Directory.GetDirectories(packagePath)
+				Me.ExtractFolderTreeFromArchivesInFolderRecursively(aPathSubFolder)
 
-	'			If Me.CancellationPending Then
-	'				Return
-	'			End If
-	'		Next
-	'	Catch ex As Exception
-	'		Dim debug As Integer = 4242
-	'	End Try
-	'End Sub
+				If Me.CancellationPending Then
+					Return StatusMessage.Canceled
+				End If
+			Next
+		Catch ex As Exception
+			status = StatusMessage.Error
+		End Try
 
-	'Private Sub ExtractFolderTreeFromArchive(ByVal archiveDirectoryPathFileName As String)
-	'	Dim aVpkFileData As BasePackageFileData
-	'	aVpkFileData = New BasePackageFileData()
+		Return status
+	End Function
 
-	'	Dim inputFileStream As FileStream = Nothing
-	'	Me.theInputFileReader = Nothing
-	'	Try
-	'		inputFileStream = New FileStream(archiveDirectoryPathFileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
-	'		If inputFileStream IsNot Nothing Then
-	'			Try
-	'				Me.theInputFileReader = New BinaryReader(inputFileStream, System.Text.Encoding.ASCII)
+	Private Function ExtractFolderTreeFromArchivesInFolder(ByVal packagePath As String) As AppEnums.StatusMessage
+		Dim status As AppEnums.StatusMessage = StatusMessage.Success
 
-	'				Dim vpkFile As New VpkFile(Me.theInputFileReader, aVpkFileData)
+		Try
+			'NOTE: Feature only valid for VPK files.
+			Dim packageFileNameFilter As String = "*.vpk"
+			For Each aPackagePathFileName As String In Directory.GetFiles(packagePath, packageFileNameFilter)
+				Me.ExtractFolderTreeFromArchive(aPackagePathFileName)
 
-	'				vpkFile.ReadHeader()
-	'				vpkFile.ReadEntries()
-	'			Catch ex As Exception
-	'				Throw
-	'			Finally
-	'				If Me.theInputFileReader IsNot Nothing Then
-	'					Me.theInputFileReader.Close()
-	'				End If
-	'			End Try
-	'		End If
-	'	Catch ex As Exception
-	'		Throw
-	'	Finally
-	'		If inputFileStream IsNot Nothing Then
-	'			inputFileStream.Close()
-	'		End If
-	'	End Try
+				If Me.CancellationPending Then
+					Return StatusMessage.Canceled
+				End If
+			Next
+		Catch ex As Exception
+			status = StatusMessage.Error
+		End Try
 
-	'	If Me.CancellationPending Then
-	'		Return
-	'	End If
+		Return status
+	End Function
 
-	'	If aVpkFileData.id = BasePackageFileData.VPK_ID Then
-	'		Dim entry As VpkDirectoryEntry
-	'		'Dim line As String
-	'		Dim archivePathFileName As String
-	'		Dim vpkPath As String
-	'		Dim vpkFileNameWithoutExtension As String
-	'		Dim vpkFileNameWithoutIndex As String
+	Private Function ExtractFolderTreeFromArchive(ByVal packagePathFileName As String) As AppEnums.StatusMessage
+		Dim status As AppEnums.StatusMessage = StatusMessage.Success
 
-	'		Me.UpdateProgressInternal(1, "")
-	'		For i As Integer = 0 To aVpkFileData.theEntries.Count - 1
-	'			entry = aVpkFileData.theEntries(i)
-	'			If entry.archiveIndex <> &H7FFF Then
-	'				vpkPath = FileManager.GetPath(archiveDirectoryPathFileName)
-	'				vpkFileNameWithoutExtension = Path.GetFileNameWithoutExtension(archiveDirectoryPathFileName)
-	'				vpkFileNameWithoutIndex = vpkFileNameWithoutExtension.Substring(0, vpkFileNameWithoutExtension.LastIndexOf("_dir"))
-	'				archivePathFileName = Path.Combine(vpkPath, vpkFileNameWithoutIndex + "_" + entry.archiveIndex.ToString("000") + ".vpk")
-	'			Else
-	'				archivePathFileName = archiveDirectoryPathFileName
-	'			End If
-	'			If Not Me.theArchivePathFileNameToFileDataMap.Keys.Contains(archivePathFileName) Then
-	'				Me.theArchivePathFileNameToFileDataMap.Add(archivePathFileName, aVpkFileData)
-	'			End If
+		Dim aPackageFileData As BasePackageFileData = Nothing
+		'aVpkFileData = New BasePackageFileData()
 
-	'			'line = aVpkFileData.theEntryDataOutputTexts(i)
-	'		Next
+		Dim inputFileStream As FileStream = Nothing
+		Me.theInputFileReader = Nothing
+		Try
+			inputFileStream = New FileStream(packagePathFileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
+			If inputFileStream IsNot Nothing Then
+				Try
+					Me.theInputFileReader = New BinaryReader(inputFileStream, System.Text.Encoding.ASCII)
 
-	'		'TODO: Create the folder tree.
-	'	End If
-	'End Sub
+					'Dim vpkFile As New VpkFile(Me.theInputFileReader, aVpkFileData)
+					Dim vpkFile As BasePackageFile
+					vpkFile = BasePackageFile.Create(packagePathFileName, Me.theArchiveDirectoryInputFileReader, Me.theInputFileReader, aPackageFileData)
+
+					vpkFile.ReadHeader()
+					vpkFile.ReadEntries(Me)
+				Catch ex As Exception
+					Throw
+				Finally
+					If Me.theInputFileReader IsNot Nothing Then
+						Me.theInputFileReader.Close()
+					End If
+				End Try
+			End If
+		Catch ex As Exception
+			status = StatusMessage.Error
+			Throw
+		Finally
+			If inputFileStream IsNot Nothing Then
+				inputFileStream.Close()
+			End If
+		End Try
+
+		If Me.CancellationPending Then
+			Return StatusMessage.Canceled
+		End If
+
+		If aPackageFileData IsNot Nothing AndAlso aPackageFileData.IsSourcePackage Then
+			Dim entry As BasePackageDirectoryEntry
+			Dim line As String
+			Dim archivePathFileName As String
+			Dim vpkPath As String
+			Dim vpkFileNameWithoutExtension As String
+			Dim vpkFileNamePrefix As String
+			Dim paths As New List(Of String)()
+
+			'Me.UpdateProgressInternal(1, "")
+			For i As Integer = 0 To aPackageFileData.theEntries.Count - 1
+				entry = aPackageFileData.theEntries(i)
+				If entry.archiveIndex <> &H7FFF Then
+					vpkPath = FileManager.GetPath(packagePathFileName)
+					vpkFileNameWithoutExtension = Path.GetFileNameWithoutExtension(packagePathFileName)
+					vpkFileNamePrefix = vpkFileNameWithoutExtension.Substring(0, vpkFileNameWithoutExtension.LastIndexOf(aPackageFileData.DirectoryFileNameSuffix))
+					archivePathFileName = Path.Combine(vpkPath, vpkFileNamePrefix + "_" + entry.archiveIndex.ToString("000") + aPackageFileData.FileExtension)
+				Else
+					archivePathFileName = packagePathFileName
+				End If
+
+				line = aPackageFileData.theEntryDataOutputTexts(i)
+
+				'Example output:
+				'addonimage.jpg crc=0x50ea4a15 metadatasz=0 fnumber=32767 ofs=0x0 sz=10749
+				'materials/models/weapons/melee/crowbar_normal.vtf crc=0x7ac0e054 metadatasz=0 fnumber=32767 ofs=0x2fed8 sz=1398196
+
+				Dim fields() As String
+				fields = line.Split(" "c)
+
+				Dim pathFileName As String = fields(0)
+				'NOTE: The last 5 fields should not have any spaces, but the path+filename field might.
+				For fieldIndex As Integer = 1 To fields.Length - 6
+					pathFileName = pathFileName + " " + fields(fieldIndex)
+				Next
+
+				'NOTE: Only need to create "models" folder-tree to have models accessible in HLMV.
+				If pathFileName.StartsWith("models/") Then
+					Dim aRelativePath As String = FileManager.GetPath(pathFileName)
+					Dim aPath As String = Path.Combine(Me.theGamePath, aRelativePath)
+					If Not FileManager.PathExistsAfterTryToCreate(aPath) Then
+						'TODO: [ExtractFolderTreeFromArchive] Path was not created, so warn user.
+						'Me.UpdateProgressInternal(1, "")
+						Dim debug As Integer = 4242
+					End If
+				End If
+			Next
+		End If
+
+		Return status
+	End Function
 
 	Private Sub List()
 		Dim archivePathFileName As String
@@ -435,7 +476,7 @@ Public Class Unpacker
 			ElseIf TheApp.Settings.UnpackMode = InputOptions.Folder Then
 				Me.ListArchivesInFolder(archivePath)
 			Else
-				Me.ListArchive(archivePathFileName)
+				Me.ListArchive(archivePathFileName, True)
 			End If
 		Catch ex As Exception
 			Dim debug As Integer = 4242
@@ -460,14 +501,10 @@ Public Class Unpacker
 
 	Private Sub ListArchivesInFolder(ByVal archivePath As String)
 		Try
-			Dim packageExtensions As New List(Of String)
-			packageExtensions.Add("*.vpk")
-			packageExtensions.Add("*.fpx")
-			packageExtensions.Add("*.gma")
-			packageExtensions.Add("*.hfs")
+			Dim packageExtensions As List(Of String) = BasePackageFile.GetListOfPackageExtensions()
 			For Each packageExtension As String In packageExtensions
 				For Each anArchivePathFileName As String In Directory.GetFiles(archivePath, packageExtension)
-					Me.ListArchive(anArchivePathFileName)
+					Me.ListArchive(anArchivePathFileName, False)
 
 					If Me.CancellationPending Then
 						Return
@@ -479,75 +516,130 @@ Public Class Unpacker
 		End Try
 	End Sub
 
-	Private Sub ListArchive(ByVal packageDirectoryPathFileName As String)
+	'checkForDirFile = true: Check if package file is valid. If not, check for a directory package file in same folder and open that instead.
+	Private Sub ListArchive(ByVal packageDirectoryPathFileName As String, ByVal checkForDirFile As Boolean)
 		Dim aPackageFileData As BasePackageFileData = Nothing
-		'aVpkFileData = New BasePackageFileData()
 
 		Dim inputFileStream As FileStream = Nothing
 		Me.theInputFileReader = Nothing
-		Try
-			inputFileStream = New FileStream(packageDirectoryPathFileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
-			If inputFileStream IsNot Nothing Then
-				Try
-					Me.theInputFileReader = New BinaryReader(inputFileStream, System.Text.Encoding.ASCII)
+		Dim loopingIsNeeded As Boolean = True
+		While loopingIsNeeded
+			Try
+				inputFileStream = New FileStream(packageDirectoryPathFileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
+				If inputFileStream IsNot Nothing Then
+					Try
+						Me.theInputFileReader = New BinaryReader(inputFileStream, System.Text.Encoding.ASCII)
 
-					'Dim vpkFile As New VpkFile(Me.theArchiveDirectoryInputFileReader, Me.theInputFileReader, aVpkFileData)
-					Dim vpkFile As BasePackageFile
-					vpkFile = BasePackageFile.Create(packageDirectoryPathFileName, Me.theArchiveDirectoryInputFileReader, Me.theInputFileReader, aPackageFileData)
+						Dim packageFile As BasePackageFile
+						packageFile = BasePackageFile.Create(packageDirectoryPathFileName, Me.theArchiveDirectoryInputFileReader, Me.theInputFileReader, aPackageFileData)
 
-					vpkFile.ReadHeader()
-					vpkFile.ReadEntries()
-				Catch ex As Exception
-					Throw
-				Finally
-					If Me.theInputFileReader IsNot Nothing Then
-						Me.theInputFileReader.Close()
-					End If
-				End Try
+						packageFile.ReadHeader()
+						If aPackageFileData IsNot Nothing AndAlso aPackageFileData.IsSourcePackage Then
+							Me.thePackageDirectoryPathFileName = packageDirectoryPathFileName
+							Me.thePackageFileData = aPackageFileData
+							Me.UpdateProgressInternal(1, "")
+							AddHandler packageFile.PackEntryRead, AddressOf Me.Package_PackEntryRead
+							packageFile.ReadEntries(Me)
+							RemoveHandler packageFile.PackEntryRead, AddressOf Me.Package_PackEntryRead
+							loopingIsNeeded = False
+						ElseIf checkForDirFile AndAlso Path.GetExtension(packageDirectoryPathFileName) = ".vpk" Then
+							'NOTE: Set this to false to only check once for a package directory file.
+							checkForDirFile = False
+
+							Dim tempPath As String = FileManager.GetPath(packageDirectoryPathFileName)
+							Dim tempFileName As String = Path.GetFileNameWithoutExtension(packageDirectoryPathFileName)
+							Dim pos As Integer = tempFileName.LastIndexOf("_")
+							If pos >= 0 Then
+								Dim dirFileName As String = tempFileName.Remove(pos + 1) + "dir.vpk"
+								packageDirectoryPathFileName = Path.Combine(tempPath, dirFileName)
+							Else
+								loopingIsNeeded = False
+							End If
+						Else
+							loopingIsNeeded = False
+						End If
+					Catch ex As Exception
+						Throw
+					Finally
+						If Me.theInputFileReader IsNot Nothing Then
+							Me.theInputFileReader.Close()
+						End If
+					End Try
+				End If
+			Catch ex As Exception
+				Throw
+			Finally
+				If inputFileStream IsNot Nothing Then
+					inputFileStream.Close()
+				End If
+			End Try
+
+			If Me.CancellationPending Then
+				Return
 			End If
-		Catch ex As Exception
-			Throw
-		Finally
-			If inputFileStream IsNot Nothing Then
-				inputFileStream.Close()
-			End If
-		End Try
+		End While
+
+		'If aPackageFileData IsNot Nothing AndAlso aPackageFileData.IsSourcePackage Then
+		'	Dim entry As BasePackageDirectoryEntry
+		'	Dim line As String
+		'	Dim archivePathFileName As String
+		'	Dim vpkPath As String
+		'	Dim vpkFileNameWithoutExtension As String
+		'	Dim vpkFileNamePrefix As String
+
+		'	Me.UpdateProgressInternal(1, "")
+		'	For i As Integer = 0 To aPackageFileData.theEntries.Count - 1
+		'		entry = aPackageFileData.theEntries(i)
+		'		If entry.archiveIndex <> &H7FFF Then
+		'			vpkPath = FileManager.GetPath(packageDirectoryPathFileName)
+		'			vpkFileNameWithoutExtension = Path.GetFileNameWithoutExtension(packageDirectoryPathFileName)
+		'			vpkFileNamePrefix = vpkFileNameWithoutExtension.Substring(0, vpkFileNameWithoutExtension.LastIndexOf(aPackageFileData.DirectoryFileNameSuffix))
+		'			archivePathFileName = Path.Combine(vpkPath, vpkFileNamePrefix + "_" + entry.archiveIndex.ToString("000") + aPackageFileData.FileExtension)
+		'		Else
+		'			archivePathFileName = packageDirectoryPathFileName
+		'		End If
+		'		If Not Me.theArchivePathFileNameToFileDataMap.Keys.Contains(archivePathFileName) Then
+		'			Me.theArchivePathFileNameToFileDataMap.Add(archivePathFileName, aPackageFileData)
+		'		End If
+		'		Me.UpdateProgressInternal(2, archivePathFileName)
+
+		'		line = aPackageFileData.theEntryDataOutputTexts(i)
+		'		Me.UpdateProgressInternal(3, line)
+
+		'		If Me.CancellationPending Then
+		'			Return
+		'		End If
+		'	Next
+		'End If
+	End Sub
+
+	Private Sub Package_PackEntryRead(ByVal sender As Object, ByVal e As SourcePackageEventArgs)
+		Dim entry As BasePackageDirectoryEntry
+		Dim line As String
+		Dim archivePathFileName As String
+		Dim vpkPath As String
+		Dim vpkFileNameWithoutExtension As String
+		Dim vpkFileNamePrefix As String
+
+		entry = e.Entry
+		If entry.archiveIndex <> &H7FFF Then
+			vpkPath = FileManager.GetPath(Me.thePackageDirectoryPathFileName)
+			vpkFileNameWithoutExtension = Path.GetFileNameWithoutExtension(Me.thePackageDirectoryPathFileName)
+			vpkFileNamePrefix = vpkFileNameWithoutExtension.Substring(0, vpkFileNameWithoutExtension.LastIndexOf(Me.thePackageFileData.DirectoryFileNameSuffix))
+			archivePathFileName = Path.Combine(vpkPath, vpkFileNamePrefix + "_" + entry.archiveIndex.ToString("000") + Me.thePackageFileData.FileExtension)
+		Else
+			archivePathFileName = Me.thePackageDirectoryPathFileName
+		End If
+		If Not Me.theArchivePathFileNameToFileDataMap.Keys.Contains(archivePathFileName) Then
+			Me.theArchivePathFileNameToFileDataMap.Add(archivePathFileName, Me.thePackageFileData)
+		End If
+		Me.UpdateProgressInternal(2, archivePathFileName)
+
+		line = e.EntryDataOutputText
+		Me.UpdateProgressInternal(3, line)
 
 		If Me.CancellationPending Then
 			Return
-		End If
-
-		If aPackageFileData.IsSourcePackage Then
-			Dim entry As BasePackageDirectoryEntry
-			Dim line As String
-			Dim archivePathFileName As String
-			Dim vpkPath As String
-			Dim vpkFileNameWithoutExtension As String
-			Dim vpkFileNamePrefix As String
-
-			Me.UpdateProgressInternal(1, "")
-			For i As Integer = 0 To aPackageFileData.theEntries.Count - 1
-				entry = aPackageFileData.theEntries(i)
-				If entry.archiveIndex <> &H7FFF Then
-					vpkPath = FileManager.GetPath(packageDirectoryPathFileName)
-					vpkFileNameWithoutExtension = Path.GetFileNameWithoutExtension(packageDirectoryPathFileName)
-					vpkFileNamePrefix = vpkFileNameWithoutExtension.Substring(0, vpkFileNameWithoutExtension.LastIndexOf(aPackageFileData.DirectoryFileNameSuffix))
-					archivePathFileName = Path.Combine(vpkPath, vpkFileNamePrefix + "_" + entry.archiveIndex.ToString("000") + aPackageFileData.FileExtension)
-				Else
-					archivePathFileName = packageDirectoryPathFileName
-				End If
-				If Not Me.theArchivePathFileNameToFileDataMap.Keys.Contains(archivePathFileName) Then
-					Me.theArchivePathFileNameToFileDataMap.Add(archivePathFileName, aPackageFileData)
-				End If
-				Me.UpdateProgressInternal(2, archivePathFileName)
-
-				line = aPackageFileData.theEntryDataOutputTexts(i)
-				Me.UpdateProgressInternal(3, line)
-
-				If Me.CancellationPending Then
-					Return
-				End If
-			Next
 		End If
 	End Sub
 
@@ -561,7 +653,7 @@ Public Class Unpacker
 		Me.theUnpackedMdlFiles.Clear()
 		Me.theLogFiles.Clear()
 
-		Me.theOutputPath = Me.GetAdjustedOutputPath()
+		Me.theOutputPath = Me.GetOutputPath()
 		Dim vpkPathFileName As String
 		vpkPathFileName = TheApp.Settings.UnpackPackagePathFolderOrFileName
 		If File.Exists(vpkPathFileName) Then
@@ -662,12 +754,15 @@ Public Class Unpacker
 
 		' Create and add a folder to the Temp path, to prevent potential file collisions and to provide user more obvious folder name.
 		Dim guid As Guid
-		guid = guid.NewGuid()
+		guid = Guid.NewGuid()
 		Dim folder As String
 		folder = "Crowbar_" + guid.ToString()
 		Me.theOutputPath = Path.Combine(Path.GetTempPath(), folder)
+		Me.theUnpackedPathsAreInTempPath = True
 		If Not FileManager.PathExistsAfterTryToCreate(Me.theOutputPath) Then
-			Me.theOutputPath = Path.GetTempPath()
+			Me.theRunSynchronousResultMessage = "WARNING: Tried to create """ + Me.theOutputPath + """ needed for extracting, but Windows did not allow it."
+			status = StatusMessage.ErrorUnableToCreateTempFolder
+			Return status
 		End If
 
 		'Dim vpkPathFileName As String
@@ -950,6 +1045,15 @@ Public Class Unpacker
 
 	'Private Sub UnpackEntryDatasToFiles(ByVal vpkFileData As BasePackageFileData, ByVal vpkPathFileName As String, ByVal entries As List(Of VpkDirectoryEntry), ByVal extractPath As String)
 	Private Sub UnpackEntryDatasToFiles(ByVal vpkFileData As BasePackageFileData, ByVal vpkPathFileName As String, ByVal entries As List(Of BasePackageDirectoryEntry))
+		' Example: [03-Nov-2019] Left 4 Dead main multi-file VPK does not have a "pak01_048.vpk" file.
+		If Not File.Exists(vpkPathFileName) Then
+			Me.UpdateProgress(2, "WARNING: Package file not found - """ + vpkPathFileName + """. The following files are indicated as being in the missing package file: ")
+			For Each entry As BasePackageDirectoryEntry In entries
+				Me.UpdateProgress(3, """" + entry.thePathFileName + """")
+			Next
+			Exit Sub
+		End If
+
 		Dim inputFileStream As FileStream = Nothing
 		Me.theInputFileReader = Nothing
 
@@ -959,13 +1063,16 @@ Public Class Unpacker
 				Try
 					Me.theInputFileReader = New BinaryReader(inputFileStream, System.Text.Encoding.ASCII)
 
+					'Dim packageDirectoryFileNameWithoutExtension As String = Path.GetFileNameWithoutExtension(vpkPathFileName)
+					Dim packageDirectoryFileNameWithoutExtension As String = Me.GetPackageDirectoryFileNameWithoutExtension(vpkPathFileName, vpkFileData)
+
 					'Dim vpkFile As New VpkFile(Me.theArchiveDirectoryInputFileReader, Me.theInputFileReader, vpkFileData)
 					Dim vpkFile As BasePackageFile
 					vpkFile = BasePackageFile.Create(vpkPathFileName, Me.theArchiveDirectoryInputFileReader, Me.theInputFileReader, vpkFileData)
 
 					For Each entry As BasePackageDirectoryEntry In entries
 						'Me.UnpackEntryDataToFile(vpkFile, entry, extractPath)
-						Me.UnpackEntryDataToFile(vpkFile, entry)
+						Me.UnpackEntryDataToFile(packageDirectoryFileNameWithoutExtension, vpkFile, entry)
 
 						If Me.CancellationPending Then
 							Exit For
@@ -989,13 +1096,18 @@ Public Class Unpacker
 	End Sub
 
 	'Private Sub UnpackEntryDataToFile(ByVal vpkFile As VpkFile, ByVal entry As VpkDirectoryEntry, ByVal extractPath As String)
-	Private Sub UnpackEntryDataToFile(ByVal vpkFile As BasePackageFile, ByVal entry As BasePackageDirectoryEntry)
-		Dim outputPathFileName As String
-		'outputPathFileName = Path.Combine(extractPath, entry.thePathFileName)
-		If entry.thePathFileName.StartsWith("<") Then
-			outputPathFileName = Path.Combine(Me.theOutputPath, entry.theRealPathFileName)
+	Private Sub UnpackEntryDataToFile(ByVal packageFileNameWithoutExtension As String, ByVal vpkFile As BasePackageFile, ByVal entry As BasePackageDirectoryEntry)
+		Dim outputPathStart As String
+		If TheApp.Settings.UnpackFolderForEachPackageIsChecked Then
+			outputPathStart = Path.Combine(Me.theOutputPath, packageFileNameWithoutExtension)
 		Else
-			outputPathFileName = Path.Combine(Me.theOutputPath, entry.thePathFileName)
+			outputPathStart = Me.theOutputPath
+		End If
+		Dim outputPathFileName As String
+		If entry.thePathFileName.StartsWith("<") Then
+			outputPathFileName = Path.Combine(outputPathStart, entry.theRealPathFileName)
+		Else
+			outputPathFileName = Path.Combine(outputPathStart, entry.thePathFileName)
 		End If
 		Dim outputPath As String
 		outputPath = FileManager.GetPath(outputPathFileName)
@@ -1017,12 +1129,12 @@ Public Class Unpacker
 			End If
 
 			If entry.thePathFileName.StartsWith("<") Then
-				Me.UpdateProgress(2, "Extracted: """ + entry.thePathFileName + """ as """ + entry.theRealPathFileName + """")
+				Me.UpdateProgress(2, "Unpacked: """ + entry.thePathFileName + """ as """ + entry.theRealPathFileName + """")
 			Else
-				Me.UpdateProgress(2, "Extracted: " + entry.thePathFileName)
+				Me.UpdateProgress(2, "Unpacked: " + entry.thePathFileName)
 			End If
 		Else
-			Me.UpdateProgress(2, "WARNING: Not extracted: " + entry.thePathFileName)
+			Me.UpdateProgress(2, "WARNING: Not unpacked: " + entry.thePathFileName)
 		End If
 	End Sub
 
@@ -1038,12 +1150,31 @@ Public Class Unpacker
 		System.Diagnostics.Process.Start(pathFileName)
 	End Sub
 
+	Private Function GetPackageDirectoryFileNameWithoutExtension(ByVal archivePathFileName As String, ByVal vpkFileData As BasePackageFileData) As String
+		Dim packageDirectoryFileNameWithoutExtension As String = ""
+
+		Dim vpkFileNameWithoutExtension As String
+		Dim vpkFileNamePrefix As String
+		Dim underscoreIndex As Integer
+		vpkFileNameWithoutExtension = Path.GetFileNameWithoutExtension(archivePathFileName)
+		underscoreIndex = vpkFileNameWithoutExtension.LastIndexOf("_")
+		If underscoreIndex >= 0 Then
+			vpkFileNamePrefix = vpkFileNameWithoutExtension.Substring(0, underscoreIndex)
+			packageDirectoryFileNameWithoutExtension = vpkFileNamePrefix + vpkFileData.DirectoryFileNameSuffix
+		Else
+			packageDirectoryFileNameWithoutExtension = vpkFileNameWithoutExtension
+		End If
+
+		Return packageDirectoryFileNameWithoutExtension
+	End Function
+
 #End Region
 
 #Region "Data"
 
 	Private theSkipCurrentPackIsActive As Boolean
 	Private theSynchronousWorkerIsActive As Boolean
+	Private theRunSynchronousResultMessage As String
 	Private theInputVpkPath As String
 	Private theOutputPath As String
 	Private theOutputPathOrModelOutputFileName As String
@@ -1051,8 +1182,10 @@ Public Class Unpacker
 	Private theLogFileStream As StreamWriter
 	Private theLastLine As String
 
-	'TODO: Not currently used for anything.
+	'TODO: Not currently used for anything but for drag-drop temp path deleteion.
 	Private theUnpackedPaths As List(Of String)
+	'NOTE: Extra guard against deleting non-temp paths from accidental bad coding.
+	Private theUnpackedPathsAreInTempPath As Boolean
 	' Used for listing unpacked files in combobox.
 	Private theUnpackedRelativePathFileNames As List(Of String)
 	'TODO: Not currently used for anything.
@@ -1068,6 +1201,11 @@ Public Class Unpacker
 	Private theArchiveDirectoryInputFileStream As FileStream
 	Private theArchiveDirectoryInputFileReader As BinaryReader
 	Private theInputFileReader As BinaryReader
+
+	Private thePackageDirectoryPathFileName As String
+	Private thePackageFileData As BasePackageFileData
+
+	Private theGamePath As String
 
 #End Region
 

@@ -25,8 +25,6 @@ Public Class Decompiler
         Me.WorkerSupportsCancellation = True
         AddHandler Me.DoWork, AddressOf Me.Decompiler_DoWork
 
-
-
         TheApp.Settings.DecompileMdlPathFileName = mdlPa
         Me.theOutputPath = mdlOPa
         TheApp.Settings.DecompileMode = InputOptions.File
@@ -115,7 +113,7 @@ Public Class Decompiler
 		If String.IsNullOrEmpty(TheApp.Settings.DecompileMdlPathFileName) Then
 			inputsAreValid = False
 		Else
-			inputsAreValid = FileManager.OutputPathIsUsable(Me.theOutputPath)
+			inputsAreValid = FileManager.PathExistsAfterTryToCreate(Me.theOutputPath)
 		End If
 
 		Return inputsAreValid
@@ -189,16 +187,14 @@ Public Class Decompiler
 		Dim progressDescriptionText As String
 		progressDescriptionText = "Decompiling with " + TheApp.GetProductNameAndVersion() + ": "
 
-
-
-        Try
-            If Me.theInputMdlPathName = "" Then
-                'Can get here if mdlPathFileName exists, but only with parts of the path using "Length8.3" names.
-                'Somehow when drag-dropping such a pathFileName, even though Windows shows full names in the path, Crowbar shows it with "Length8.3" names.
-                progressDescriptionText += """" + mdlPathFileName + """"
+		Try
+			If Me.theInputMdlPathName = "" Then
+				'Can get here if mdlPathFileName exists, but only with parts of the path using "Length8.3" names.
+				'Somehow when drag-dropping such a pathFileName, even though Windows shows full names in the path, Crowbar shows it with "Length8.3" names.
+				progressDescriptionText += """" + mdlPathFileName + """"
                 Console.WriteLine(progressDescriptionText + " ...")
                 Console.WriteLine()
-                Console.WriteLine("ERROR: Failed because actual path is too long or doesnt exist.")
+                Console.WriteLine("ERROR: Failed because actual path is too long.")
                 status = StatusMessage.Error
             ElseIf TheApp.Settings.DecompileMode = InputOptions.FolderRecursion Then
                 progressDescriptionText += """" + Me.theInputMdlPathName + """ (folder + subfolders)"
@@ -221,8 +217,6 @@ Public Class Decompiler
 
                 Me.DecompileModelsInFolder(Me.theInputMdlPathName)
             Else
-
-
                 progressDescriptionText += """" + mdlPathFileName + """"
                 Console.WriteLine(progressDescriptionText + " ...")
                 status = Me.DecompileOneModel(mdlPathFileName)
@@ -290,15 +284,11 @@ Public Class Decompiler
             Dim modelName As String
             modelName = Path.GetFileNameWithoutExtension(mdlPathFileName)
 
-
-
             Me.theModelOutputPath = Path.Combine(Me.theOutputPath, mdlRelativePathName)
             Me.theModelOutputPath = Path.GetFullPath(Me.theModelOutputPath)
             If TheApp.Settings.DecompileFolderForEachModelIsChecked Then
                 Me.theModelOutputPath = Path.Combine(Me.theModelOutputPath, modelName)
             End If
-
-
 
             FileManager.CreatePath(Me.theModelOutputPath)
 
@@ -306,7 +296,7 @@ Public Class Decompiler
             '	Me.CreateLogTextFile(mdlPathFileName)
             'Catch ex As Exception
             '	Console.WriteLine()
-            '	Console.WriteLine( "ERROR: Crowbar tried to write the decompile log file but the system gave this message: " + ex.Message)
+            '	Console.WriteLine("ERROR: Crowbar tried to write the decompile log file but the system gave this message: " + ex.Message)
             '	status = StatusMessage.Error
             '	Return status
             'End Try
@@ -320,8 +310,6 @@ Public Class Decompiler
             Console.WriteLine()
             Console.WriteLine("Decompiling """ + mdlRelativePathFileName + """ ...")
 
-
-
             Dim model As SourceModel = Nothing
             Dim version As Integer
             Try
@@ -334,6 +322,7 @@ Public Class Decompiler
                     End If
                 Else
                     Console.WriteLine("ERROR: Model version " + CStr(version) + " not currently supported.")
+                    Console.WriteLine("       If the model works in-game or HLMV, try changing 'Override MDL version' option.")
                     Console.WriteLine("... Decompiling """ + mdlRelativePathFileName + """ FAILED.")
                     status = StatusMessage.Error
                     Return status
@@ -344,7 +333,7 @@ Public Class Decompiler
                 status = StatusMessage.Error
                 Return status
             Catch ex As Exception
-                'Console.WriteLine( "ERROR: " + ex.Message)
+                'Console.WriteLine("ERROR: " + ex.Message)
                 Console.WriteLine("Crowbar tried to read the MDL file but the system gave this message: " + ex.Message)
                 Console.WriteLine("... Decompiling """ + mdlRelativePathFileName + """ FAILED.")
                 status = StatusMessage.Error
@@ -354,12 +343,12 @@ Public Class Decompiler
             Console.WriteLine("Reading MDL file header ...")
             status = model.ReadMdlFileHeader()
             'If status = StatusMessage.ErrorInvalidMdlFileId Then
-            '	Console.WriteLine( "ERROR: File does not have expected MDL header ID (first 4 bytes of file) of 'IDST' (without quotes). MDL file is not a GoldSource- or Source-engine MDL file.")
+            '	Console.WriteLine("ERROR: File does not have expected MDL header ID (first 4 bytes of file) of 'IDST' (without quotes). MDL file is not a GoldSource- or Source-engine MDL file.")
             '	Return status
             'ElseIf status = StatusMessage.ErrorInvalidInternalMdlFileSize Then
-            '	Console.WriteLine( "WARNING: The internally recorded file size is different than the actual file size. Some data might not decompile correctly.")
+            '	Console.WriteLine("WARNING: The internally recorded file size is different than the actual file size. Some data might not decompile correctly.")
             'ElseIf status = StatusMessage.ErrorRequiredMdlFileNotFound Then
-            '	Console.WriteLine( "ERROR: MDL file not found.")
+            '	Console.WriteLine("ERROR: MDL file not found.")
             '	Return status
             'End If
             If status = StatusMessage.ErrorInvalidInternalMdlFileSize Then
@@ -371,22 +360,22 @@ Public Class Decompiler
             Dim filesFoundFlags As AppEnums.FilesFoundFlags
             filesFoundFlags = model.CheckForRequiredFiles()
             'If status = StatusMessage.ErrorRequiredSequenceGroupMdlFileNotFound Then
-            '	Console.WriteLine( "ERROR: Sequence Group MDL file not found.")
+            '	Console.WriteLine("ERROR: Sequence Group MDL file not found.")
             '	Return status
             'ElseIf status = StatusMessage.ErrorRequiredTextureMdlFileNotFound Then
-            '	Console.WriteLine( "ERROR: Texture MDL file not found.")
+            '	Console.WriteLine("ERROR: Texture MDL file not found.")
             '	Return status
             'ElseIf status = StatusMessage.ErrorRequiredAniFileNotFound Then
-            '	Console.WriteLine( "ERROR: ANI file not found.")
+            '	Console.WriteLine("ERROR: ANI file not found.")
             '	Return status
             'ElseIf status = StatusMessage.ErrorRequiredVtxFileNotFound Then
-            '	Console.WriteLine( "ERROR: VTX file not found.")
+            '	Console.WriteLine("ERROR: VTX file not found.")
             '	Return status
             'ElseIf status = StatusMessage.ErrorRequiredVvdFileNotFound Then
-            '	Console.WriteLine( "ERROR: VVD file not found.")
+            '	Console.WriteLine("ERROR: VVD file not found.")
             '	Return status
             'End If
-            'Console.WriteLine( "... All required files found.")
+            'Console.WriteLine("... All required files found.")
             If filesFoundFlags = AppEnums.FilesFoundFlags.ErrorRequiredSequenceGroupMdlFileNotFound Then
                 Console.WriteLine("ERROR: Sequence Group MDL file not found.")
                 Return StatusMessage.ErrorRequiredSequenceGroupMdlFileNotFound
@@ -415,8 +404,6 @@ Public Class Decompiler
                 Return status
             End If
 
-
-
             Console.WriteLine("Reading data ...")
             status = Me.ReadCompiledFiles(mdlPathFileName, model)
             If status = StatusMessage.ErrorRequiredMdlFileNotFound _
@@ -442,9 +429,9 @@ Public Class Decompiler
                 Console.WriteLine("... Reading data finished.")
             End If
 
-            'Console.WriteLine( "Processinging data ...")
+            'Console.WriteLine("Processinging data ...")
             'status = Me.ProcessData(model)
-            'Console.WriteLine( "... Processinging data finished.")
+            'Console.WriteLine("... Processinging data finished.")
 
             'NOTE: Write log files before data files, in case something goes wrong with writing data files.
             If TheApp.Settings.DecompileDebugInfoFilesIsChecked Then
@@ -489,8 +476,6 @@ Public Class Decompiler
             '		Me.theLogFileStream.Close()
             '	End If
         End Try
-
-
 
         Return status
     End Function
@@ -713,10 +698,10 @@ Public Class Decompiler
 
         If TheApp.Settings.DecompileQcFileIsChecked Then
             If TheApp.Settings.DecompileGroupIntoQciFilesIsChecked Then
-                'Console.WriteLine( "Writing QC and QCI files ...")
+                'Console.WriteLine("Writing QC and QCI files ...")
                 Console.WriteLine("QC and QCI files: ")
             Else
-                'Console.WriteLine( "Writing QC file ...")
+                'Console.WriteLine("Writing QC file ...")
                 Console.WriteLine("QC file: ")
             End If
             Me.theDecompiledFileType = DecompiledFileType.QC
@@ -734,9 +719,9 @@ Public Class Decompiler
 
             RemoveHandler model.SourceModelProgress, AddressOf Me.Model_SourceModelProgress
             'If TheApp.Settings.DecompileGroupIntoQciFilesIsChecked Then
-            '	Console.WriteLine( "... Writing QC and QCI files finished.")
+            '	Console.WriteLine("... Writing QC and QCI files finished.")
             'Else
-            '	Console.WriteLine( "... Writing QC file finished.")
+            '	Console.WriteLine("... Writing QC file finished.")
             'End If
         End If
 
@@ -754,7 +739,7 @@ Public Class Decompiler
 
         If TheApp.Settings.DecompileReferenceMeshSmdFileIsChecked Then
             If model.HasMeshData Then
-                'Console.WriteLine( "Writing reference mesh files ...")
+                'Console.WriteLine("Writing reference mesh files ...")
                 Console.WriteLine("Reference mesh files: ")
                 Me.theDecompiledFileType = DecompiledFileType.ReferenceMesh
                 Me.theFirstDecompiledFileHasBeenAdded = False
@@ -763,7 +748,7 @@ Public Class Decompiler
                 status = model.WriteReferenceMeshFiles(Me.theModelOutputPath)
 
                 RemoveHandler model.SourceModelProgress, AddressOf Me.Model_SourceModelProgress
-                'Console.WriteLine( "... Writing reference mesh files finished.")
+                'Console.WriteLine("... Writing reference mesh files finished.")
             End If
         End If
 
@@ -775,7 +760,7 @@ Public Class Decompiler
 
         If TheApp.Settings.DecompileLodMeshSmdFilesIsChecked Then
             If model.HasLodMeshData Then
-                'Console.WriteLine( "Writing LOD mesh files ...")
+                'Console.WriteLine("Writing LOD mesh files ...")
                 Console.WriteLine("LOD mesh files: ")
                 Me.theDecompiledFileType = DecompiledFileType.LodMesh
                 Me.theFirstDecompiledFileHasBeenAdded = False
@@ -784,7 +769,7 @@ Public Class Decompiler
                 status = model.WriteLodMeshFiles(Me.theModelOutputPath)
 
                 RemoveHandler model.SourceModelProgress, AddressOf Me.Model_SourceModelProgress
-                'Console.WriteLine( "... Writing LOD mesh files finished.")
+                'Console.WriteLine("... Writing LOD mesh files finished.")
             End If
         End If
 
@@ -796,7 +781,7 @@ Public Class Decompiler
 
         If TheApp.Settings.DecompilePhysicsMeshSmdFileIsChecked Then
             If model.HasPhysicsMeshData Then
-                'Console.WriteLine( "Writing physics mesh file ...")
+                'Console.WriteLine("Writing physics mesh file ...")
                 Console.WriteLine("Physics mesh file: ")
                 Me.theDecompiledFileType = DecompiledFileType.PhysicsMesh
                 Me.theFirstDecompiledFileHasBeenAdded = False
@@ -805,7 +790,7 @@ Public Class Decompiler
                 status = model.WritePhysicsMeshSmdFile(Me.theModelOutputPath)
 
                 RemoveHandler model.SourceModelProgress, AddressOf Me.Model_SourceModelProgress
-                'Console.WriteLine( "... Writing physics mesh file finished.")
+                'Console.WriteLine("... Writing physics mesh file finished.")
             End If
         End If
 
@@ -823,7 +808,7 @@ Public Class Decompiler
 
         If TheApp.Settings.DecompileVertexAnimationVtaFileIsChecked Then
             If model.HasVertexAnimationData Then
-                'Console.WriteLine( "Writing VTA file ...")
+                'Console.WriteLine("Writing VTA file ...")
                 Console.WriteLine("Vertex animation files: ")
                 Me.theDecompiledFileType = DecompiledFileType.VertexAnimation
                 Me.theFirstDecompiledFileHasBeenAdded = False
@@ -840,7 +825,7 @@ Public Class Decompiler
                 'End If
 
                 RemoveHandler model.SourceModelProgress, AddressOf Me.Model_SourceModelProgress
-                'Console.WriteLine( "... Writing VTA file finished.")
+                'Console.WriteLine("... Writing VTA file finished.")
             End If
         End If
 
@@ -860,8 +845,8 @@ Public Class Decompiler
             If model.HasBoneAnimationData Then
                 Dim outputPath As String
                 outputPath = Path.Combine(Me.theModelOutputPath, SourceFileNamesModule.GetAnimationSmdRelativePath(model.Name))
-                If FileManager.OutputPathIsUsable(outputPath) Then
-                    'Console.WriteLine( "Writing bone animation SMD files ...")
+                If FileManager.PathExistsAfterTryToCreate(outputPath) Then
+                    'Console.WriteLine("Writing bone animation SMD files ...")
                     Console.WriteLine("Bone animation files: ")
                     Me.theDecompiledFileType = DecompiledFileType.BoneAnimation
                     Me.theFirstDecompiledFileHasBeenAdded = False
@@ -870,7 +855,7 @@ Public Class Decompiler
                     status = model.WriteBoneAnimationSmdFiles(Me.theModelOutputPath)
 
                     RemoveHandler model.SourceModelProgress, AddressOf Me.Model_SourceModelProgress
-                    'Console.WriteLine( "... Writing bone animation SMD files finished.")
+                    'Console.WriteLine("... Writing bone animation SMD files finished.")
                 Else
                     Console.WriteLine("WARNING: Unable to create """ + outputPath + """ where bone animation SMD files would be written.")
                 End If
@@ -885,7 +870,7 @@ Public Class Decompiler
 
         If TheApp.Settings.DecompileProceduralBonesVrdFileIsChecked Then
             If model.HasProceduralBonesData Then
-                'Console.WriteLine( "Writing VRD file ...")
+                'Console.WriteLine("Writing VRD file ...")
                 Console.WriteLine("Procedural bones file: ")
                 Me.theDecompiledFileType = DecompiledFileType.ProceduralBones
                 Me.theFirstDecompiledFileHasBeenAdded = False
@@ -901,7 +886,7 @@ Public Class Decompiler
                 End If
 
                 RemoveHandler model.SourceModelProgress, AddressOf Me.Model_SourceModelProgress
-                'Console.WriteLine( "... Writing VRD file finished.")
+                'Console.WriteLine("... Writing VRD file finished.")
             End If
         End If
 
@@ -951,7 +936,7 @@ Public Class Decompiler
 
         If TheApp.Settings.DecompileTextureBmpFilesIsChecked Then
             If model.HasTextureFileData Then
-                'Console.WriteLine( "Writing texture files ...")
+                'Console.WriteLine("Writing texture files ...")
                 Console.WriteLine("Texture files: ")
                 Me.theDecompiledFileType = DecompiledFileType.TextureBmp
                 Me.theFirstDecompiledFileHasBeenAdded = False
@@ -960,7 +945,7 @@ Public Class Decompiler
                 status = model.WriteTextureFiles(Me.theModelOutputPath)
 
                 RemoveHandler model.SourceModelProgress, AddressOf Me.Model_SourceModelProgress
-                'Console.WriteLine( "... Writing texture files finished.")
+                'Console.WriteLine("... Writing texture files finished.")
             End If
         End If
 
@@ -1048,9 +1033,9 @@ Public Class Decompiler
             '		Dim model As SourceModel
             '		model = CType(sender, SourceModel)
             '		model.WritingSingleFileIsCanceled = True
-            '		'Console.WriteLine( "WARNING: The file, """ + smdFileName + """, was written already in a previous step.")
+            '		'Console.WriteLine("WARNING: The file, """ + smdFileName + """, was written already in a previous step.")
             '		'Else
-            '		'	Console.WriteLine( "Writing """ + fileName + """ file ...")
+            '		'	Console.WriteLine("Writing """ + fileName + """ file ...")
             '	End If
         ElseIf e.Progress = ProgressOptions.WritingFileFailed Then
             Console.WriteLine(e.Message)
@@ -1059,7 +1044,7 @@ Public Class Decompiler
             Dim fileName As String
             pathFileName = e.Message
             fileName = Path.GetFileName(pathFileName)
-            'Console.WriteLine( "... Writing """ + fileName + """ file finished.")
+            'Console.WriteLine("... Writing """ + fileName + """ file finished.")
             Console.WriteLine(fileName)
 
             If Not Me.theFirstDecompiledFileHasBeenAdded AndAlso File.Exists(pathFileName) Then

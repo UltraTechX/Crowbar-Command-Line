@@ -506,6 +506,7 @@ Public Class Win32Api
 		Dim extensionKey As Microsoft.Win32.RegistryKey = Nothing
 		Dim classnameKey As Microsoft.Win32.RegistryKey = Nothing
 		Dim defaultIconKey As Microsoft.Win32.RegistryKey = Nothing
+		Dim shellKey As Microsoft.Win32.RegistryKey = Nothing
 		Dim shellOpenCommandKey As Microsoft.Win32.RegistryKey = Nothing
 		Try
 			Win32Api.DeleteFileAssociation(extension, className, description, "")
@@ -520,6 +521,9 @@ Public Class Win32Api
 
 			defaultIconKey = classesKey.CreateSubKey(className + "\DefaultIcon")
 			defaultIconKey.SetValue("", exeProgram + ",0")
+
+			shellKey = classesKey.CreateSubKey(className + "\Shell")
+			shellKey.SetValue("", "Open")
 
 			shellOpenCommandKey = classesKey.CreateSubKey(className + "\Shell\Open\Command")
 			shellOpenCommandKey.SetValue("", exeProgram + " ""%1""")
@@ -546,9 +550,21 @@ Public Class Win32Api
 
 		Dim currentUser As Microsoft.Win32.RegistryKey = Microsoft.Win32.Registry.CurrentUser
 		Dim classesKey As Microsoft.Win32.RegistryKey = Nothing
+		Dim shellKey As Microsoft.Win32.RegistryKey = Nothing
 		Dim shellOpenCommandKey As Microsoft.Win32.RegistryKey = Nothing
 		Try
 			classesKey = currentUser.OpenSubKey("Software\Classes", True)
+
+			'shellKey = classesKey.OpenSubKey(className + "\Shell")
+			'If shellKey IsNot Nothing Then
+			'	If shellKey.GetValueKind("") = Microsoft.Win32.RegistryValueKind.String Then
+			'		Dim keyValueString3 As String = CType(shellKey.GetValue(""), String)
+			'		If keyValueString3 = "Open" Then
+			'			Return True
+			'		End If
+			'	End If
+			'End If
+
 			shellOpenCommandKey = classesKey.OpenSubKey(className + "\Shell\Open\Command")
 			If shellOpenCommandKey IsNot Nothing Then
 				If shellOpenCommandKey.GetValueKind("") = Microsoft.Win32.RegistryValueKind.String Then

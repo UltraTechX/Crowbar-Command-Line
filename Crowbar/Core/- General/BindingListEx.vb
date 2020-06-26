@@ -202,6 +202,27 @@ Public Class BindingListEx(Of T)
 		Return prop
 	End Function
 
+	Protected Overrides ReadOnly Property SupportsSearchingCore() As Boolean
+		Get
+			Return True
+		End Get
+	End Property
+
+	Protected Overrides Function FindCore(ByVal propertyDesc As PropertyDescriptor, ByVal key As Object) As Integer
+		Dim i As Integer
+		Dim propInfo As Reflection.PropertyInfo = GetType(T).GetProperty(propertyDesc.Name)
+		Dim item As T
+		If key IsNot Nothing Then
+			For i = 0 To Count - 1
+				item = CType(Items(i), T)
+				If propInfo.GetValue(item, Nothing).Equals(key) Then
+					Return i
+				End If
+			Next
+		End If
+		Return -1
+	End Function
+
 	'' Override so that an extra ListChanged event with ListChangedType.Reset  
 	'' is raised BEFORE the items are cleared. 
 	'Protected Overrides Sub ClearItems()

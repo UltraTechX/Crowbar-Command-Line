@@ -1,9 +1,9 @@
-<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
+<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
 Partial Class DecompileUserControl
 	Inherits BaseUserControl
 
 	'UserControl overrides dispose to clean up the component list.
-	<System.Diagnostics.DebuggerNonUserCode()> _
+	<System.Diagnostics.DebuggerNonUserCode()>
 	Protected Overrides Sub Dispose(ByVal disposing As Boolean)
 		Try
 			If disposing AndAlso components IsNot Nothing Then
@@ -20,7 +20,7 @@ Partial Class DecompileUserControl
 	'NOTE: The following procedure is required by the Windows Form Designer
 	'It can be modified using the Windows Form Designer.  
 	'Do not modify it using the code editor.
-	<System.Diagnostics.DebuggerStepThrough()> _
+	<System.Diagnostics.DebuggerStepThrough()>
 	Private Sub InitializeComponent()
 		Me.components = New System.ComponentModel.Container()
 		Me.ToolTip1 = New System.Windows.Forms.ToolTip(Me.components)
@@ -30,22 +30,22 @@ Partial Class DecompileUserControl
 		Me.FormatForStricterImportersCheckBox = New System.Windows.Forms.CheckBox()
 		Me.UseMixedCaseForKeywordsCheckBox = New System.Windows.Forms.CheckBox()
 		Me.RemovePathFromMaterialFileNamesCheckBox = New System.Windows.Forms.CheckBox()
-		Me.UseUvsForDoomMusicCompilerCheckBox = New System.Windows.Forms.CheckBox()
+		Me.UseNonValveUvConversionCheckBox = New System.Windows.Forms.CheckBox()
 		Me.OverrideMdlVersionLabel = New System.Windows.Forms.Label()
 		Me.OverrideMdlVersionComboBox = New System.Windows.Forms.ComboBox()
 		Me.Panel2 = New System.Windows.Forms.Panel()
-		Me.MdlPathFileNameTextBox = New Crowbar.TextBoxEx()
-		Me.GotoOutputPathButton = New System.Windows.Forms.Button()
+		Me.Label1 = New System.Windows.Forms.Label()
 		Me.DecompileComboBox = New System.Windows.Forms.ComboBox()
+		Me.MdlPathFileNameTextBox = New Crowbar.TextBoxEx()
+		Me.BrowseForMdlPathFolderOrFileNameButton = New System.Windows.Forms.Button()
+		Me.GotoMdlButton = New System.Windows.Forms.Button()
+		Me.GotoOutputPathButton = New System.Windows.Forms.Button()
 		Me.BrowseForOutputPathButton = New System.Windows.Forms.Button()
 		Me.OutputPathTextBox = New Crowbar.TextBoxEx()
 		Me.OutputSubfolderTextBox = New Crowbar.TextBoxEx()
 		Me.OutputPathComboBox = New System.Windows.Forms.ComboBox()
 		Me.Label3 = New System.Windows.Forms.Label()
 		Me.UseDefaultOutputSubfolderButton = New System.Windows.Forms.Button()
-		Me.GotoMdlButton = New System.Windows.Forms.Button()
-		Me.Label1 = New System.Windows.Forms.Label()
-		Me.BrowseForMdlPathFolderOrFileNameButton = New System.Windows.Forms.Button()
 		Me.SplitContainer1 = New System.Windows.Forms.SplitContainer()
 		Me.OptionsGroupBox = New System.Windows.Forms.GroupBox()
 		Me.Panel3 = New System.Windows.Forms.Panel()
@@ -77,6 +77,7 @@ Partial Class DecompileUserControl
 		Me.UseInCompileButton = New System.Windows.Forms.Button()
 		Me.GotoDecompiledFileButton = New System.Windows.Forms.Button()
 		Me.UseInEditButton = New System.Windows.Forms.Button()
+		Me.PrefixMeshFileNamesWithModelNameCheckBox = New System.Windows.Forms.CheckBox()
 		Me.Panel2.SuspendLayout()
 		CType(Me.SplitContainer1, System.ComponentModel.ISupportInitialize).BeginInit()
 		Me.SplitContainer1.Panel1.SuspendLayout()
@@ -91,7 +92,7 @@ Partial Class DecompileUserControl
 		'DebugInfoCheckBox
 		'
 		Me.DebugInfoCheckBox.AutoSize = True
-		Me.DebugInfoCheckBox.Location = New System.Drawing.Point(3, 95)
+		Me.DebugInfoCheckBox.Location = New System.Drawing.Point(3, 118)
 		Me.DebugInfoCheckBox.Name = "DebugInfoCheckBox"
 		Me.DebugInfoCheckBox.Size = New System.Drawing.Size(190, 17)
 		Me.DebugInfoCheckBox.TabIndex = 14
@@ -102,7 +103,7 @@ Partial Class DecompileUserControl
 		'LogFileCheckBox
 		'
 		Me.LogFileCheckBox.AutoSize = True
-		Me.LogFileCheckBox.Location = New System.Drawing.Point(3, 72)
+		Me.LogFileCheckBox.Location = New System.Drawing.Point(3, 95)
 		Me.LogFileCheckBox.Name = "LogFileCheckBox"
 		Me.LogFileCheckBox.Size = New System.Drawing.Size(108, 17)
 		Me.LogFileCheckBox.TabIndex = 13
@@ -113,24 +114,24 @@ Partial Class DecompileUserControl
 		'DeclareSequenceQciCheckBox
 		'
 		Me.DeclareSequenceQciCheckBox.AutoSize = True
-		Me.DeclareSequenceQciCheckBox.Location = New System.Drawing.Point(3, 141)
+		Me.DeclareSequenceQciCheckBox.Location = New System.Drawing.Point(3, 164)
 		Me.DeclareSequenceQciCheckBox.Name = "DeclareSequenceQciCheckBox"
 		Me.DeclareSequenceQciCheckBox.Size = New System.Drawing.Size(154, 17)
 		Me.DeclareSequenceQciCheckBox.TabIndex = 40
 		Me.DeclareSequenceQciCheckBox.Text = "$DeclareSequence QCI file"
-		Me.ToolTip1.SetToolTip(Me.DeclareSequenceQciCheckBox, "Write a QCI file with a $DeclareSequence line for each sequence in the MDL file. " & _
+		Me.ToolTip1.SetToolTip(Me.DeclareSequenceQciCheckBox, "Write a QCI file with a $DeclareSequence line for each sequence in the MDL file. " &
 		"Useful for getting sequences in correct order for multiplayer.")
 		Me.DeclareSequenceQciCheckBox.UseVisualStyleBackColor = True
 		'
 		'FormatForStricterImportersCheckBox
 		'
 		Me.FormatForStricterImportersCheckBox.AutoSize = True
-		Me.FormatForStricterImportersCheckBox.Location = New System.Drawing.Point(3, 26)
+		Me.FormatForStricterImportersCheckBox.Location = New System.Drawing.Point(3, 49)
 		Me.FormatForStricterImportersCheckBox.Name = "FormatForStricterImportersCheckBox"
 		Me.FormatForStricterImportersCheckBox.Size = New System.Drawing.Size(162, 17)
 		Me.FormatForStricterImportersCheckBox.TabIndex = 12
 		Me.FormatForStricterImportersCheckBox.Text = "Format for stricter importers"
-		Me.ToolTip1.SetToolTip(Me.FormatForStricterImportersCheckBox, "Write decompiled files in a format that some importers expect, but is not as easy" & _
+		Me.ToolTip1.SetToolTip(Me.FormatForStricterImportersCheckBox, "Write decompiled files in a format that some importers expect, but is not as easy" &
 		" to read.")
 		Me.FormatForStricterImportersCheckBox.UseVisualStyleBackColor = True
 		'
@@ -153,26 +154,26 @@ Partial Class DecompileUserControl
 		Me.RemovePathFromMaterialFileNamesCheckBox.Size = New System.Drawing.Size(207, 17)
 		Me.RemovePathFromMaterialFileNamesCheckBox.TabIndex = 41
 		Me.RemovePathFromMaterialFileNamesCheckBox.Text = "Remove path from material file names"
-		Me.ToolTip1.SetToolTip(Me.RemovePathFromMaterialFileNamesCheckBox, "Write only the file name in the SMD, even if a path was stored. This might cause " & _
+		Me.ToolTip1.SetToolTip(Me.RemovePathFromMaterialFileNamesCheckBox, "Write only the file name in the SMD, even if a path was stored. This might cause " &
 		"problem with $CDMaterials in QC file.")
 		Me.RemovePathFromMaterialFileNamesCheckBox.UseVisualStyleBackColor = True
 		'
-		'UseUvsForDoomMusicCompilerCheckBox
+		'UseNonValveUvConversionCheckBox
 		'
-		Me.UseUvsForDoomMusicCompilerCheckBox.AutoSize = True
-		Me.UseUvsForDoomMusicCompilerCheckBox.Location = New System.Drawing.Point(20, 164)
-		Me.UseUvsForDoomMusicCompilerCheckBox.Name = "UseUvsForDoomMusicCompilerCheckBox"
-		Me.UseUvsForDoomMusicCompilerCheckBox.Size = New System.Drawing.Size(283, 17)
-		Me.UseUvsForDoomMusicCompilerCheckBox.TabIndex = 44
-		Me.UseUvsForDoomMusicCompilerCheckBox.Text = "Use UVs for DoomMusic's model compiler (GoldSource)"
-		Me.ToolTip1.SetToolTip(Me.UseUvsForDoomMusicCompilerCheckBox, "For DoomMusic's compiler, UV calculation is slightly different, so tick this for " & _
-		"better results.")
-		Me.UseUvsForDoomMusicCompilerCheckBox.UseVisualStyleBackColor = True
+		Me.UseNonValveUvConversionCheckBox.AutoSize = True
+		Me.UseNonValveUvConversionCheckBox.Location = New System.Drawing.Point(20, 164)
+		Me.UseNonValveUvConversionCheckBox.Name = "UseNonValveUvConversionCheckBox"
+		Me.UseNonValveUvConversionCheckBox.Size = New System.Drawing.Size(231, 17)
+		Me.UseNonValveUvConversionCheckBox.TabIndex = 44
+		Me.UseNonValveUvConversionCheckBox.Text = "Use non-Valve UV conversion (GoldSource)"
+		Me.ToolTip1.SetToolTip(Me.UseNonValveUvConversionCheckBox, "[ u=s/width ] and [ v=1-(t/height) ] instead of Valve's [ u=s/(width-1) ] and [ v" &
+		"=1-(t/(height-1)) ]")
+		Me.UseNonValveUvConversionCheckBox.UseVisualStyleBackColor = True
 		'
 		'OverrideMdlVersionLabel
 		'
 		Me.OverrideMdlVersionLabel.AutoSize = True
-		Me.OverrideMdlVersionLabel.Location = New System.Drawing.Point(3, 188)
+		Me.OverrideMdlVersionLabel.Location = New System.Drawing.Point(3, 202)
 		Me.OverrideMdlVersionLabel.Name = "OverrideMdlVersionLabel"
 		Me.OverrideMdlVersionLabel.Size = New System.Drawing.Size(114, 13)
 		Me.OverrideMdlVersionLabel.TabIndex = 46
@@ -183,7 +184,7 @@ Partial Class DecompileUserControl
 		'
 		Me.OverrideMdlVersionComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
 		Me.OverrideMdlVersionComboBox.FormattingEnabled = True
-		Me.OverrideMdlVersionComboBox.Location = New System.Drawing.Point(123, 185)
+		Me.OverrideMdlVersionComboBox.Location = New System.Drawing.Point(123, 199)
 		Me.OverrideMdlVersionComboBox.Name = "OverrideMdlVersionComboBox"
 		Me.OverrideMdlVersionComboBox.Size = New System.Drawing.Size(100, 21)
 		Me.OverrideMdlVersionComboBox.TabIndex = 45
@@ -191,18 +192,18 @@ Partial Class DecompileUserControl
 		'
 		'Panel2
 		'
-		Me.Panel2.Controls.Add(Me.MdlPathFileNameTextBox)
-		Me.Panel2.Controls.Add(Me.GotoOutputPathButton)
+		Me.Panel2.Controls.Add(Me.Label1)
 		Me.Panel2.Controls.Add(Me.DecompileComboBox)
+		Me.Panel2.Controls.Add(Me.MdlPathFileNameTextBox)
+		Me.Panel2.Controls.Add(Me.BrowseForMdlPathFolderOrFileNameButton)
+		Me.Panel2.Controls.Add(Me.GotoMdlButton)
+		Me.Panel2.Controls.Add(Me.GotoOutputPathButton)
 		Me.Panel2.Controls.Add(Me.BrowseForOutputPathButton)
 		Me.Panel2.Controls.Add(Me.OutputPathTextBox)
 		Me.Panel2.Controls.Add(Me.OutputSubfolderTextBox)
 		Me.Panel2.Controls.Add(Me.OutputPathComboBox)
 		Me.Panel2.Controls.Add(Me.Label3)
 		Me.Panel2.Controls.Add(Me.UseDefaultOutputSubfolderButton)
-		Me.Panel2.Controls.Add(Me.GotoMdlButton)
-		Me.Panel2.Controls.Add(Me.Label1)
-		Me.Panel2.Controls.Add(Me.BrowseForMdlPathFolderOrFileNameButton)
 		Me.Panel2.Controls.Add(Me.SplitContainer1)
 		Me.Panel2.Dock = System.Windows.Forms.DockStyle.Fill
 		Me.Panel2.Location = New System.Drawing.Point(0, 0)
@@ -211,14 +212,52 @@ Partial Class DecompileUserControl
 		Me.Panel2.Size = New System.Drawing.Size(776, 536)
 		Me.Panel2.TabIndex = 8
 		'
+		'Label1
+		'
+		Me.Label1.Location = New System.Drawing.Point(3, 8)
+		Me.Label1.Name = "Label1"
+		Me.Label1.Size = New System.Drawing.Size(64, 13)
+		Me.Label1.TabIndex = 0
+		Me.Label1.Text = "MDL input:"
+		'
+		'DecompileComboBox
+		'
+		Me.DecompileComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+		Me.DecompileComboBox.FormattingEnabled = True
+		Me.DecompileComboBox.Location = New System.Drawing.Point(73, 5)
+		Me.DecompileComboBox.Name = "DecompileComboBox"
+		Me.DecompileComboBox.Size = New System.Drawing.Size(140, 21)
+		Me.DecompileComboBox.TabIndex = 1
+		'
 		'MdlPathFileNameTextBox
 		'
 		Me.MdlPathFileNameTextBox.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
 			Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-		Me.MdlPathFileNameTextBox.Location = New System.Drawing.Point(209, 5)
+		Me.MdlPathFileNameTextBox.CueBannerText = ""
+		Me.MdlPathFileNameTextBox.Location = New System.Drawing.Point(219, 5)
 		Me.MdlPathFileNameTextBox.Name = "MdlPathFileNameTextBox"
-		Me.MdlPathFileNameTextBox.Size = New System.Drawing.Size(445, 21)
+		Me.MdlPathFileNameTextBox.Size = New System.Drawing.Size(435, 21)
 		Me.MdlPathFileNameTextBox.TabIndex = 1
+		'
+		'BrowseForMdlPathFolderOrFileNameButton
+		'
+		Me.BrowseForMdlPathFolderOrFileNameButton.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+		Me.BrowseForMdlPathFolderOrFileNameButton.Location = New System.Drawing.Point(660, 3)
+		Me.BrowseForMdlPathFolderOrFileNameButton.Name = "BrowseForMdlPathFolderOrFileNameButton"
+		Me.BrowseForMdlPathFolderOrFileNameButton.Size = New System.Drawing.Size(64, 23)
+		Me.BrowseForMdlPathFolderOrFileNameButton.TabIndex = 2
+		Me.BrowseForMdlPathFolderOrFileNameButton.Text = "Browse..."
+		Me.BrowseForMdlPathFolderOrFileNameButton.UseVisualStyleBackColor = True
+		'
+		'GotoMdlButton
+		'
+		Me.GotoMdlButton.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+		Me.GotoMdlButton.Location = New System.Drawing.Point(730, 3)
+		Me.GotoMdlButton.Name = "GotoMdlButton"
+		Me.GotoMdlButton.Size = New System.Drawing.Size(43, 23)
+		Me.GotoMdlButton.TabIndex = 3
+		Me.GotoMdlButton.Text = "Goto"
+		Me.GotoMdlButton.UseVisualStyleBackColor = True
 		'
 		'GotoOutputPathButton
 		'
@@ -229,15 +268,6 @@ Partial Class DecompileUserControl
 		Me.GotoOutputPathButton.TabIndex = 18
 		Me.GotoOutputPathButton.Text = "Goto"
 		Me.GotoOutputPathButton.UseVisualStyleBackColor = True
-		'
-		'DecompileComboBox
-		'
-		Me.DecompileComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-		Me.DecompileComboBox.FormattingEnabled = True
-		Me.DecompileComboBox.Location = New System.Drawing.Point(63, 4)
-		Me.DecompileComboBox.Name = "DecompileComboBox"
-		Me.DecompileComboBox.Size = New System.Drawing.Size(140, 21)
-		Me.DecompileComboBox.TabIndex = 1
 		'
 		'BrowseForOutputPathButton
 		'
@@ -254,18 +284,20 @@ Partial Class DecompileUserControl
 		'
 		Me.OutputPathTextBox.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
 			Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-		Me.OutputPathTextBox.Location = New System.Drawing.Point(209, 34)
+		Me.OutputPathTextBox.CueBannerText = ""
+		Me.OutputPathTextBox.Location = New System.Drawing.Point(219, 34)
 		Me.OutputPathTextBox.Name = "OutputPathTextBox"
-		Me.OutputPathTextBox.Size = New System.Drawing.Size(445, 21)
+		Me.OutputPathTextBox.Size = New System.Drawing.Size(435, 21)
 		Me.OutputPathTextBox.TabIndex = 16
 		'
 		'OutputSubfolderTextBox
 		'
 		Me.OutputSubfolderTextBox.Anchor = CType(((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Left) _
 			Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-		Me.OutputSubfolderTextBox.Location = New System.Drawing.Point(209, 34)
+		Me.OutputSubfolderTextBox.CueBannerText = ""
+		Me.OutputSubfolderTextBox.Location = New System.Drawing.Point(219, 34)
 		Me.OutputSubfolderTextBox.Name = "OutputSubfolderTextBox"
-		Me.OutputSubfolderTextBox.Size = New System.Drawing.Size(445, 21)
+		Me.OutputSubfolderTextBox.Size = New System.Drawing.Size(435, 21)
 		Me.OutputSubfolderTextBox.TabIndex = 20
 		Me.OutputSubfolderTextBox.Visible = False
 		'
@@ -273,7 +305,7 @@ Partial Class DecompileUserControl
 		'
 		Me.OutputPathComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
 		Me.OutputPathComboBox.FormattingEnabled = True
-		Me.OutputPathComboBox.Location = New System.Drawing.Point(63, 33)
+		Me.OutputPathComboBox.Location = New System.Drawing.Point(73, 34)
 		Me.OutputPathComboBox.Name = "OutputPathComboBox"
 		Me.OutputPathComboBox.Size = New System.Drawing.Size(140, 21)
 		Me.OutputPathComboBox.TabIndex = 14
@@ -295,34 +327,6 @@ Partial Class DecompileUserControl
 		Me.UseDefaultOutputSubfolderButton.TabIndex = 19
 		Me.UseDefaultOutputSubfolderButton.Text = "Use Default"
 		Me.UseDefaultOutputSubfolderButton.UseVisualStyleBackColor = True
-		'
-		'GotoMdlButton
-		'
-		Me.GotoMdlButton.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-		Me.GotoMdlButton.Location = New System.Drawing.Point(730, 3)
-		Me.GotoMdlButton.Name = "GotoMdlButton"
-		Me.GotoMdlButton.Size = New System.Drawing.Size(43, 23)
-		Me.GotoMdlButton.TabIndex = 3
-		Me.GotoMdlButton.Text = "Goto"
-		Me.GotoMdlButton.UseVisualStyleBackColor = True
-		'
-		'Label1
-		'
-		Me.Label1.Location = New System.Drawing.Point(3, 8)
-		Me.Label1.Name = "Label1"
-		Me.Label1.Size = New System.Drawing.Size(64, 13)
-		Me.Label1.TabIndex = 0
-		Me.Label1.Text = "MDL input:"
-		'
-		'BrowseForMdlPathFolderOrFileNameButton
-		'
-		Me.BrowseForMdlPathFolderOrFileNameButton.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
-		Me.BrowseForMdlPathFolderOrFileNameButton.Location = New System.Drawing.Point(660, 3)
-		Me.BrowseForMdlPathFolderOrFileNameButton.Name = "BrowseForMdlPathFolderOrFileNameButton"
-		Me.BrowseForMdlPathFolderOrFileNameButton.Size = New System.Drawing.Size(64, 23)
-		Me.BrowseForMdlPathFolderOrFileNameButton.TabIndex = 2
-		Me.BrowseForMdlPathFolderOrFileNameButton.Text = "Browse..."
-		Me.BrowseForMdlPathFolderOrFileNameButton.UseVisualStyleBackColor = True
 		'
 		'SplitContainer1
 		'
@@ -372,6 +376,7 @@ Partial Class DecompileUserControl
 		'Panel3
 		'
 		Me.Panel3.AutoScroll = True
+		Me.Panel3.Controls.Add(Me.PrefixMeshFileNamesWithModelNameCheckBox)
 		Me.Panel3.Controls.Add(Me.OverrideMdlVersionLabel)
 		Me.Panel3.Controls.Add(Me.OverrideMdlVersionComboBox)
 		Me.Panel3.Controls.Add(Me.FolderForEachModelCheckBox)
@@ -453,7 +458,7 @@ Partial Class DecompileUserControl
 		'Panel1
 		'
 		Me.Panel1.AutoScroll = True
-		Me.Panel1.Controls.Add(Me.UseUvsForDoomMusicCompilerCheckBox)
+		Me.Panel1.Controls.Add(Me.UseNonValveUvConversionCheckBox)
 		Me.Panel1.Controls.Add(Me.OnlyChangedMaterialsInTextureGroupLinesCheckBox)
 		Me.Panel1.Controls.Add(Me.UseMixedCaseForKeywordsCheckBox)
 		Me.Panel1.Controls.Add(Me.RemovePathFromMaterialFileNamesCheckBox)
@@ -641,6 +646,7 @@ Partial Class DecompileUserControl
 		Me.DecompilerLogTextBox.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
 			Or System.Windows.Forms.AnchorStyles.Left) _
 			Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+		Me.DecompilerLogTextBox.CueBannerText = ""
 		Me.DecompilerLogTextBox.Font = New System.Drawing.Font("Courier New", 8.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
 		Me.DecompilerLogTextBox.HideSelection = False
 		Me.DecompilerLogTextBox.Location = New System.Drawing.Point(0, 0)
@@ -694,6 +700,17 @@ Partial Class DecompileUserControl
 		Me.UseInEditButton.Text = "Use in Edit"
 		Me.UseInEditButton.UseVisualStyleBackColor = True
 		Me.UseInEditButton.Visible = False
+		'
+		'PrefixMeshFileNamesWithModelNameCheckBox
+		'
+		Me.PrefixMeshFileNamesWithModelNameCheckBox.AutoSize = True
+		Me.PrefixMeshFileNamesWithModelNameCheckBox.Location = New System.Drawing.Point(3, 26)
+		Me.PrefixMeshFileNamesWithModelNameCheckBox.Name = "PrefixMeshFileNamesWithModelNameCheckBox"
+		Me.PrefixMeshFileNamesWithModelNameCheckBox.Size = New System.Drawing.Size(216, 17)
+		Me.PrefixMeshFileNamesWithModelNameCheckBox.TabIndex = 47
+		Me.PrefixMeshFileNamesWithModelNameCheckBox.Text = "Prefix mesh file names with model name"
+		Me.ToolTip1.SetToolTip(Me.PrefixMeshFileNamesWithModelNameCheckBox, "Avoid file name conflicts.")
+		Me.PrefixMeshFileNamesWithModelNameCheckBox.UseVisualStyleBackColor = True
 		'
 		'DecompileUserControl
 		'
@@ -768,8 +785,8 @@ Partial Class DecompileUserControl
 	Friend WithEvents Panel3 As System.Windows.Forms.Panel
 	Friend WithEvents OnlyChangedMaterialsInTextureGroupLinesCheckBox As System.Windows.Forms.CheckBox
 	Friend WithEvents OutputSubfolderTextBox As Crowbar.TextBoxEx
-	Friend WithEvents UseUvsForDoomMusicCompilerCheckBox As System.Windows.Forms.CheckBox
+	Friend WithEvents UseNonValveUvConversionCheckBox As System.Windows.Forms.CheckBox
 	Friend WithEvents OverrideMdlVersionLabel As System.Windows.Forms.Label
 	Friend WithEvents OverrideMdlVersionComboBox As System.Windows.Forms.ComboBox
-
+	Friend WithEvents PrefixMeshFileNamesWithModelNameCheckBox As CheckBox
 End Class

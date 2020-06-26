@@ -23,16 +23,22 @@ Public Class AppSettings
 		Me.theCompilerIsRunning = False
 		Me.theViewDataViewerIsRunning = False
 		'Me.theViewerIsRunning = False
+		Me.thePackerIsRunning = False
 
 		Me.theGameSetups = New BindingListExAutoSort(Of GameSetup)("GameName")
 		Me.theSteamAppPathFileName = "C:\Program Files (x86)\Steam\Steam.exe"
 		Me.theSteamLibraryPaths = New BindingListEx(Of SteamLibraryPath)()
 		Me.theSetUpGamesGameSetupSelectedIndex = 0
 
+		Me.theDownloadItemIdOrLink = ""
+		Me.theDownloadOutputFolderOption = DownloadOutputPathOptions.DocumentsFolder
+		Me.theDownloadOutputWorkPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
+		Me.SetDefaultDownloadOptions()
+
 		Me.theUnpackContainerType = ContainerType.VPK
 		Me.theUnpackPackagePathFolderOrFileName = ""
 		'Me.theUnpackOutputFolderOption = OutputFolderOptions.SubfolderName
-		Me.theUnpackOutputFolderOption = UnpackOutputPathOptions.WorkFolder
+		Me.theUnpackOutputFolderOption = UnpackOutputPathOptions.SameFolder
 		Me.SetDefaultUnpackOutputSubfolderName()
 		Me.theUnpackOutputFullPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
 		Me.theUnpackGameSetupSelectedIndex = 0
@@ -40,6 +46,7 @@ Public Class AppSettings
 		Me.theUnpackMode = InputOptions.File
 
 		Me.thePreviewMdlPathFileName = ""
+		Me.thePreviewOverrideMdlVersion = SupportedMdlVersion.DoNotOverride
 		Me.thePreviewGameSetupSelectedIndex = 0
 
 		Me.theDecompileMdlPathFileName = ""
@@ -47,8 +54,13 @@ Public Class AppSettings
 		Me.theDecompileOutputFolderOption = DecompileOutputPathOptions.WorkFolder
 		Me.SetDefaultDecompileOutputSubfolderName()
 		Me.theDecompileOutputFullPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
-		Me.SetDefaultDecompileOptions()
+		Me.SetDefaultDecompileReCreateFilesOptions()
 		Me.theDecompileMode = InputOptions.File
+		Me.theDecompileFolderForEachModelIsChecked = False
+		Me.theDecompileStricterFormatIsChecked = False
+		Me.theDecompileLogFileIsChecked = False
+		Me.theDecompileDebugInfoFilesIsChecked = False
+		Me.theDecompileOverrideMdlVersion = SupportedMdlVersion.DoNotOverride
 
 		Me.theCompileQcPathFileName = ""
 		Me.theCompileOutputFolderIsChecked = True
@@ -64,11 +76,33 @@ Public Class AppSettings
 		Me.thePatchMode = InputOptions.File
 
 		Me.theViewMdlPathFileName = ""
+		Me.theViewOverrideMdlVersion = SupportedMdlVersion.DoNotOverride
 		Me.theViewGameSetupSelectedIndex = 0
+
+		Me.thePackInputPathFileName = ""
+		'Me.theCompileOutputFolderIsChecked = True
+		''Me.theCompileOutputFolderOption = OutputFolderOptions.SubfolderName
+		Me.thePackOutputFolderOption = PackOutputPathOptions.ParentFolder
+		'Me.SetDefaultCompileOutputSubfolderName()
+		Me.thePackOutputPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
+		Me.thePackGameSetupSelectedIndex = 0
+		Me.SetDefaultPackOptions()
+		'Me.theCompileMode = InputOptions.File
+
+		Me.thePublishGameSelectedIndex = 0
+		Me.thePublishSteamAppUserInfos = New BindingListExAutoSort(Of SteamAppUserInfo)("AppID")
+		Me.thePublishSearchField = PublishSearchFieldOptions.ID
+		Me.thePublishSearchText = ""
+		'Me.thePublishDragDroppedContentPath = ""
 
 		Me.SetDefaultOptionsAutoOpenOptions()
 		Me.SetDefaultOptionsDragAndDropOptions()
 		Me.SetDefaultOptionsContextMenuOptions()
+
+		Me.theUpdateDownloadPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
+		Me.theUpdateUpdateToNewPathIsChecked = False
+		Me.theUpdateUpdateDownloadPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
+		Me.theUpdateCopySettingsIsChecked = True
 
 		'Me.Init()
 	End Sub
@@ -143,7 +177,7 @@ Public Class AppSettings
 		End Set
 	End Property
 
-	<XmlIgnore()> _
+	<XmlIgnore()>
 	Public ReadOnly Property SteamAppPathFileName() As String
 		Get
 			Return TheApp.GetProcessedPathFileName(Me.theSteamAppPathFileName)
@@ -154,7 +188,7 @@ Public Class AppSettings
 		'End Set
 	End Property
 
-	<XmlElement("SteamAppPathFileName")> _
+	<XmlElement("SteamAppPathFileName")>
 	Public Property SteamAppPathFileNameUnprocessed() As String
 		Get
 			Return Me.theSteamAppPathFileName
@@ -178,11 +212,111 @@ Public Class AppSettings
 
 	Public Property SetUpGamesGameSetupSelectedIndex() As Integer
 		Get
+			'NOTE: Must change in the Get() because theGameSetups might not have been read-in yet (i.e. GameSetups appear *after* this setting in XML file).
+			If Me.theSetUpGamesGameSetupSelectedIndex >= Me.theGameSetups.Count Then
+				Me.theSetUpGamesGameSetupSelectedIndex = TheApp.Settings.GameSetups.Count - 1
+			End If
 			Return Me.theSetUpGamesGameSetupSelectedIndex
 		End Get
 		Set(ByVal value As Integer)
 			Me.theSetUpGamesGameSetupSelectedIndex = value
 			NotifyPropertyChanged("SetUpGamesGameSetupSelectedIndex")
+		End Set
+	End Property
+
+	Public Property DownloadItemIdOrLink() As String
+		Get
+			Return Me.theDownloadItemIdOrLink
+		End Get
+		Set(ByVal value As String)
+			If Me.theDownloadItemIdOrLink <> value Then
+				Me.theDownloadItemIdOrLink = value
+				NotifyPropertyChanged("DownloadItemIdOrLink")
+			End If
+		End Set
+	End Property
+
+	Public Property DownloadOutputFolderOption() As DownloadOutputPathOptions
+		Get
+			Return Me.theDownloadOutputFolderOption
+		End Get
+		Set(ByVal value As DownloadOutputPathOptions)
+			If Me.theDownloadOutputFolderOption <> value Then
+				Me.theDownloadOutputFolderOption = value
+				NotifyPropertyChanged("DownloadOutputFolderOption")
+			End If
+		End Set
+	End Property
+
+	Public Property DownloadOutputWorkPath() As String
+		Get
+			Return Me.theDownloadOutputWorkPath
+		End Get
+		Set(ByVal value As String)
+			If Me.theDownloadOutputWorkPath <> value Then
+				Me.theDownloadOutputWorkPath = value
+				NotifyPropertyChanged("DownloadOutputWorkPath")
+			End If
+		End Set
+	End Property
+
+	Public Property DownloadUseItemIdIsChecked() As Boolean
+		Get
+			Return Me.theDownloadUseItemIdIsChecked
+		End Get
+		Set(ByVal value As Boolean)
+			If Me.theDownloadUseItemIdIsChecked <> value Then
+				Me.theDownloadUseItemIdIsChecked = value
+				NotifyPropertyChanged("DownloadUseItemIdIsChecked")
+			End If
+		End Set
+	End Property
+
+	Public Property DownloadPrependItemTitleIsChecked() As Boolean
+		Get
+			Return Me.theDownloadPrependItemTitleIsChecked
+		End Get
+		Set(ByVal value As Boolean)
+			If Me.theDownloadPrependItemTitleIsChecked <> value Then
+				Me.theDownloadPrependItemTitleIsChecked = value
+				NotifyPropertyChanged("DownloadPrependItemTitleIsChecked")
+			End If
+		End Set
+	End Property
+
+	Public Property DownloadAppendItemUpdateDateTimeIsChecked() As Boolean
+		Get
+			Return Me.theDownloadAppendItemUpdateDateTimeIsChecked
+		End Get
+		Set(ByVal value As Boolean)
+			If Me.theDownloadAppendItemUpdateDateTimeIsChecked <> value Then
+				Me.theDownloadAppendItemUpdateDateTimeIsChecked = value
+				NotifyPropertyChanged("DownloadAppendItemUpdateDateTimeIsChecked")
+			End If
+		End Set
+	End Property
+
+	Public Property DownloadReplaceSpacesWithUnderscoresIsChecked() As Boolean
+		Get
+			Return Me.theDownloadReplaceSpacesWithUnderscoresIsChecked
+		End Get
+		Set(ByVal value As Boolean)
+			If Me.theDownloadReplaceSpacesWithUnderscoresIsChecked <> value Then
+				Me.theDownloadReplaceSpacesWithUnderscoresIsChecked = value
+				NotifyPropertyChanged("DownloadReplaceSpacesWithUnderscoresIsChecked")
+			End If
+		End Set
+	End Property
+
+	Public Property DownloadConvertToExpectedFileOrFolderCheckBoxIsChecked() As Boolean
+		Get
+			Return Me.theDownloadConvertToExpectedFileOrFolderCheckBoxIsChecked
+		End Get
+		Set(ByVal value As Boolean)
+			If Me.theDownloadConvertToExpectedFileOrFolderCheckBoxIsChecked <> value Then
+				Me.theDownloadConvertToExpectedFileOrFolderCheckBoxIsChecked = value
+				NotifyPropertyChanged("DownloadConvertToExpectedFileOrFolderCheckBoxIsChecked")
+			End If
 		End Set
 	End Property
 
@@ -203,6 +337,16 @@ Public Class AppSettings
 		Set(ByVal value As UnpackOutputPathOptions)
 			Me.theUnpackOutputFolderOption = value
 			NotifyPropertyChanged("UnpackOutputFolderOption")
+		End Set
+	End Property
+
+	Public Property UnpackOutputSamePath() As String
+		Get
+			Return Me.theUnpackOutputSamePath
+		End Get
+		Set(ByVal value As String)
+			Me.theUnpackOutputSamePath = value
+			NotifyPropertyChanged("UnpackOutputSamePath")
 		End Set
 	End Property
 
@@ -228,11 +372,25 @@ Public Class AppSettings
 
 	Public Property UnpackGameSetupSelectedIndex() As Integer
 		Get
+			'NOTE: Must change in the Get() because theGameSetups might not have been read-in yet (i.e. GameSetups appear *after* this setting in XML file).
+			If Me.theUnpackGameSetupSelectedIndex >= Me.theGameSetups.Count Then
+				Me.theUnpackGameSetupSelectedIndex = TheApp.Settings.GameSetups.Count - 1
+			End If
 			Return Me.theUnpackGameSetupSelectedIndex
 		End Get
 		Set(ByVal value As Integer)
 			Me.theUnpackGameSetupSelectedIndex = value
 			NotifyPropertyChanged("UnpackGameSetupSelectedIndex")
+		End Set
+	End Property
+
+	Public Property UnpackFolderForEachPackageIsChecked() As Boolean
+		Get
+			Return Me.theUnpackFolderForEachPackageIsChecked
+		End Get
+		Set(ByVal value As Boolean)
+			Me.theUnpackFolderForEachPackageIsChecked = value
+			NotifyPropertyChanged("UnpackFolderForEachPackageIsChecked")
 		End Set
 	End Property
 
@@ -268,7 +426,7 @@ Public Class AppSettings
 		End Set
 	End Property
 
-	<XmlIgnore()> _
+	<XmlIgnore()>
 	Public Property UnpackerIsRunning() As Boolean
 		Get
 			Return Me.theUnpackerIsRunning
@@ -289,8 +447,22 @@ Public Class AppSettings
 		End Set
 	End Property
 
+	Public Property PreviewOverrideMdlVersion() As SupportedMdlVersion
+		Get
+			Return Me.thePreviewOverrideMdlVersion
+		End Get
+		Set(ByVal value As SupportedMdlVersion)
+			Me.thePreviewOverrideMdlVersion = value
+			NotifyPropertyChanged("PreviewOverrideMdlVersion")
+		End Set
+	End Property
+
 	Public Property PreviewGameSetupSelectedIndex() As Integer
 		Get
+			'NOTE: Must change in the Get() because theGameSetups might not have been read-in yet (i.e. GameSetups appear *after* this setting in XML file).
+			If Me.thePreviewGameSetupSelectedIndex >= Me.theGameSetups.Count Then
+				Me.thePreviewGameSetupSelectedIndex = TheApp.Settings.GameSetups.Count - 1
+			End If
 			Return Me.thePreviewGameSetupSelectedIndex
 		End Get
 		Set(ByVal value As Integer)
@@ -299,7 +471,7 @@ Public Class AppSettings
 		End Set
 	End Property
 
-	<XmlIgnore()> _
+	<XmlIgnore()>
 	Public Property PreviewDataViewerIsRunning() As Boolean
 		Get
 			Return Me.thePreviewDataViewerIsRunning
@@ -310,7 +482,7 @@ Public Class AppSettings
 		End Set
 	End Property
 
-	<XmlIgnore()> _
+	<XmlIgnore()>
 	Public Property PreviewViewerIsRunning() As Boolean
 		Get
 			Return Me.thePreviewViewerIsRunning
@@ -511,16 +683,6 @@ Public Class AppSettings
 		End Set
 	End Property
 
-	Public Property DecompileDeclareSequenceQciFileIsChecked() As Boolean
-		Get
-			Return Me.theDecompileDeclareSequenceQciFileIsChecked
-		End Get
-		Set(ByVal value As Boolean)
-			Me.theDecompileDeclareSequenceQciFileIsChecked = value
-			NotifyPropertyChanged("DecompileDeclareSequenceQciFileIsChecked")
-		End Set
-	End Property
-
 	Public Property DecompileFolderForEachModelIsChecked() As Boolean
 		Get
 			Return Me.theDecompileFolderForEachModelIsChecked
@@ -528,6 +690,26 @@ Public Class AppSettings
 		Set(ByVal value As Boolean)
 			Me.theDecompileFolderForEachModelIsChecked = value
 			NotifyPropertyChanged("DecompileFolderForEachModelIsChecked")
+		End Set
+	End Property
+
+	Public Property DecompilePrefixFileNamesWithModelNameIsChecked() As Boolean
+		Get
+			Return Me.theDecompilePrefixFileNamesWithModelNameIsChecked
+		End Get
+		Set(ByVal value As Boolean)
+			Me.theDecompilePrefixFileNamesWithModelNameIsChecked = value
+			NotifyPropertyChanged("DecompilePrefixFileNamesWithModelNameIsChecked")
+		End Set
+	End Property
+
+	Public Property DecompileStricterFormatIsChecked() As Boolean
+		Get
+			Return Me.theDecompileStricterFormatIsChecked
+		End Get
+		Set(ByVal value As Boolean)
+			Me.theDecompileStricterFormatIsChecked = value
+			NotifyPropertyChanged("DecompileStricterFormatIsChecked")
 		End Set
 	End Property
 
@@ -551,13 +733,13 @@ Public Class AppSettings
 		End Set
 	End Property
 
-	Public Property DecompileStricterFormatIsChecked() As Boolean
+	Public Property DecompileDeclareSequenceQciFileIsChecked() As Boolean
 		Get
-			Return Me.theDecompileStricterFormatIsChecked
+			Return Me.theDecompileDeclareSequenceQciFileIsChecked
 		End Get
 		Set(ByVal value As Boolean)
-			Me.theDecompileStricterFormatIsChecked = value
-			NotifyPropertyChanged("DecompileStricterFormatIsChecked")
+			Me.theDecompileDeclareSequenceQciFileIsChecked = value
+			NotifyPropertyChanged("DecompileDeclareSequenceQciFileIsChecked")
 		End Set
 	End Property
 
@@ -571,13 +753,13 @@ Public Class AppSettings
 		End Set
 	End Property
 
-	Public Property DecompileUseUvsForDoomMusicCompilerIsChecked() As Boolean
+	Public Property DecompileUseNonValveUvConversionIsChecked() As Boolean
 		Get
-			Return Me.theDecompileUseUvsForDoomMusicCompilerIsChecked
+			Return Me.theDecompileUseNonValveUvConversionIsChecked
 		End Get
 		Set(ByVal value As Boolean)
-			Me.theDecompileUseUvsForDoomMusicCompilerIsChecked = value
-			NotifyPropertyChanged("DecompileUseUvsForDoomMusicCompilerIsChecked")
+			Me.theDecompileUseNonValveUvConversionIsChecked = value
+			NotifyPropertyChanged("DecompileUseNonValveUvConversionIsChecked")
 		End Set
 	End Property
 
@@ -601,7 +783,7 @@ Public Class AppSettings
 		End Set
 	End Property
 
-	<XmlIgnore()> _
+	<XmlIgnore()>
 	Public Property DecompilerIsRunning() As Boolean
 		Get
 			Return Me.theDecompilerIsRunning
@@ -609,16 +791,6 @@ Public Class AppSettings
 		Set(ByVal value As Boolean)
 			Me.theDecompilerIsRunning = value
 			NotifyPropertyChanged("DecompilerIsRunning")
-		End Set
-	End Property
-
-	Public Property CompileGameSetupSelectedIndex() As Integer
-		Get
-			Return Me.theCompileGameSetupSelectedIndex
-		End Get
-		Set(ByVal value As Integer)
-			Me.theCompileGameSetupSelectedIndex = value
-			NotifyPropertyChanged("CompileGameSetupSelectedIndex")
 		End Set
 	End Property
 
@@ -691,6 +863,20 @@ Public Class AppSettings
 	'		NotifyPropertyChanged("CompileOutputPathName")
 	'	End Set
 	'End Property
+
+	Public Property CompileGameSetupSelectedIndex() As Integer
+		Get
+			'NOTE: Must change in the Get() because theGameSetups might not have been read-in yet (i.e. GameSetups appear *after* this setting in XML file).
+			If Me.theCompileGameSetupSelectedIndex >= Me.theGameSetups.Count Then
+				Me.theCompileGameSetupSelectedIndex = TheApp.Settings.GameSetups.Count - 1
+			End If
+			Return Me.theCompileGameSetupSelectedIndex
+		End Get
+		Set(ByVal value As Integer)
+			Me.theCompileGameSetupSelectedIndex = value
+			NotifyPropertyChanged("CompileGameSetupSelectedIndex")
+		End Set
+	End Property
 
 	Public Property CompileGoldSourceLogFileIsChecked() As Boolean
 		Get
@@ -772,7 +958,7 @@ Public Class AppSettings
 		End Set
 	End Property
 
-	<XmlIgnore()> _
+	<XmlIgnore()>
 	Public Property CompileOptionsText() As String
 		Get
 			Return Me.theCompileOptionsText
@@ -793,7 +979,7 @@ Public Class AppSettings
 		End Set
 	End Property
 
-	<XmlIgnore()> _
+	<XmlIgnore()>
 	Public Property CompilerIsRunning() As Boolean
 		Get
 			Return Me.theCompilerIsRunning
@@ -834,8 +1020,22 @@ Public Class AppSettings
 		End Set
 	End Property
 
+	Public Property ViewOverrideMdlVersion() As SupportedMdlVersion
+		Get
+			Return Me.theViewOverrideMdlVersion
+		End Get
+		Set(ByVal value As SupportedMdlVersion)
+			Me.theViewOverrideMdlVersion = value
+			NotifyPropertyChanged("ViewOverrideMdlVersion")
+		End Set
+	End Property
+
 	Public Property ViewGameSetupSelectedIndex() As Integer
 		Get
+			'NOTE: Must change in the Get() because theGameSetups might not have been read-in yet (i.e. GameSetups appear *after* this setting in XML file).
+			If Me.theViewGameSetupSelectedIndex >= Me.theGameSetups.Count Then
+				Me.theViewGameSetupSelectedIndex = TheApp.Settings.GameSetups.Count - 1
+			End If
 			Return Me.theViewGameSetupSelectedIndex
 		End Get
 		Set(ByVal value As Integer)
@@ -844,7 +1044,7 @@ Public Class AppSettings
 		End Set
 	End Property
 
-	<XmlIgnore()> _
+	<XmlIgnore()>
 	Public Property ViewDataViewerIsRunning() As Boolean
 		Get
 			Return Me.theViewDataViewerIsRunning
@@ -855,7 +1055,7 @@ Public Class AppSettings
 		End Set
 	End Property
 
-	<XmlIgnore()> _
+	<XmlIgnore()>
 	Public Property ViewViewerIsRunning() As Boolean
 		Get
 			Return Me.theViewViewerIsRunning
@@ -865,6 +1065,173 @@ Public Class AppSettings
 			NotifyPropertyChanged("ViewerIsRunning")
 		End Set
 	End Property
+
+	Public Property PackMode() As PackInputOptions
+		Get
+			Return Me.thePackMode
+		End Get
+		Set(ByVal value As PackInputOptions)
+			Me.thePackMode = value
+			NotifyPropertyChanged("PackMode")
+		End Set
+	End Property
+
+	Public Property PackInputPath() As String
+		Get
+			Return Me.thePackInputPathFileName
+		End Get
+		Set(ByVal value As String)
+			Me.thePackInputPathFileName = value
+			NotifyPropertyChanged("PackInputPath")
+		End Set
+	End Property
+
+	Public Property PackOutputFolderOption() As PackOutputPathOptions
+		Get
+			Return Me.thePackOutputFolderOption
+		End Get
+		Set(ByVal value As PackOutputPathOptions)
+			Me.thePackOutputFolderOption = value
+			NotifyPropertyChanged("PackOutputFolderOption")
+		End Set
+	End Property
+
+	Public Property PackOutputParentPath() As String
+		Get
+			Return Me.thePackOutputParentPath
+		End Get
+		Set(ByVal value As String)
+			Me.thePackOutputParentPath = value
+			NotifyPropertyChanged("PackOutputParentPath")
+		End Set
+	End Property
+
+	Public Property PackOutputPath() As String
+		Get
+			Return Me.thePackOutputPath
+		End Get
+		Set(ByVal value As String)
+			Me.thePackOutputPath = value
+			NotifyPropertyChanged("PackOutputPath")
+		End Set
+	End Property
+
+	Public Property PackGameSetupSelectedIndex() As Integer
+		Get
+			'NOTE: Must change in the Get() because theGameSetups might not have been read-in yet (i.e. GameSetups appear *after* this setting in XML file).
+			If Me.thePackGameSetupSelectedIndex >= Me.theGameSetups.Count Then
+				Me.thePackGameSetupSelectedIndex = TheApp.Settings.GameSetups.Count - 1
+			End If
+			Return Me.thePackGameSetupSelectedIndex
+		End Get
+		Set(ByVal value As Integer)
+			Me.thePackGameSetupSelectedIndex = value
+			NotifyPropertyChanged("PackGameSetupSelectedIndex")
+		End Set
+	End Property
+
+	Public Property PackLogFileIsChecked() As Boolean
+		Get
+			Return Me.thePackLogFileIsChecked
+		End Get
+		Set(ByVal value As Boolean)
+			Me.thePackLogFileIsChecked = value
+			NotifyPropertyChanged("PackLogFileIsChecked")
+		End Set
+	End Property
+
+	Public Property PackOptionMultiFileVpkIsChecked() As Boolean
+		Get
+			Return Me.thePackOptionMultiFileVpkIsChecked
+		End Get
+		Set(ByVal value As Boolean)
+			Me.thePackOptionMultiFileVpkIsChecked = value
+			NotifyPropertyChanged("PackOptionMultiFileVpkIsChecked")
+		End Set
+	End Property
+
+	<XmlIgnore()>
+	Public Property PackOptionsText() As String
+		Get
+			Return Me.thePackOptionsText
+		End Get
+		Set(ByVal value As String)
+			Me.thePackOptionsText = value
+			NotifyPropertyChanged("PackOptionsText")
+		End Set
+	End Property
+
+	<XmlIgnore()>
+	Public Property PackerIsRunning() As Boolean
+		Get
+			Return Me.thePackerIsRunning
+		End Get
+		Set(ByVal value As Boolean)
+			Me.thePackerIsRunning = value
+			NotifyPropertyChanged("PackerIsRunning")
+		End Set
+	End Property
+
+	Public Property PublishGameSelectedIndex() As Integer
+		Get
+			Return Me.thePublishGameSelectedIndex
+		End Get
+		Set(ByVal value As Integer)
+			If Me.thePublishGameSelectedIndex <> value Then
+				Me.thePublishGameSelectedIndex = value
+				NotifyPropertyChanged("PublishGameSelectedIndex")
+			End If
+		End Set
+	End Property
+
+	Public Property PublishSteamAppUserInfos() As BindingListExAutoSort(Of SteamAppUserInfo)
+		Get
+			Return Me.thePublishSteamAppUserInfos
+		End Get
+		Set(ByVal value As BindingListExAutoSort(Of SteamAppUserInfo))
+			If Me.thePublishSteamAppUserInfos IsNot value Then
+				Me.thePublishSteamAppUserInfos = value
+				NotifyPropertyChanged("PublishSteamAppUserInfos")
+			End If
+		End Set
+	End Property
+
+	Public Property PublishSearchField() As PublishSearchFieldOptions
+		Get
+			Return Me.thePublishSearchField
+		End Get
+		Set(ByVal value As PublishSearchFieldOptions)
+			If Me.thePublishSearchField <> value Then
+				Me.thePublishSearchField = value
+				NotifyPropertyChanged("PublishSearchField")
+			End If
+		End Set
+	End Property
+
+	Public Property PublishSearchText() As String
+		Get
+			Return Me.thePublishSearchText
+		End Get
+		Set(ByVal value As String)
+			If Me.thePublishSearchText <> value Then
+				Me.thePublishSearchText = value
+				NotifyPropertyChanged("PublishSearchText")
+			End If
+		End Set
+	End Property
+
+	'<XmlIgnore()>
+	'Public Property PublishDragDroppedContentPath() As String
+	'	Get
+	'		Return Me.thePublishDragDroppedContentPath
+	'	End Get
+	'	Set(ByVal value As String)
+	'		If Me.thePublishDragDroppedContentPath <> value Then
+	'			Me.thePublishDragDroppedContentPath = value
+	'			NotifyPropertyChanged("PublishDragDroppedContentPath")
+	'		End If
+	'	End Set
+	'End Property
 
 	Public Property OptionsAutoOpenVpkFileIsChecked() As Boolean
 		Get
@@ -878,6 +1245,16 @@ Public Class AppSettings
 		End Set
 	End Property
 
+	Public Property OptionsAutoOpenVpkFileOption() As ActionType
+		Get
+			Return Me.theOptionsAutoOpenVpkFileOption
+		End Get
+		Set(ByVal value As ActionType)
+			Me.theOptionsAutoOpenVpkFileOption = value
+			NotifyPropertyChanged("OptionsAutoOpenVpkFileOption")
+		End Set
+	End Property
+
 	Public Property OptionsAutoOpenGmaFileIsChecked() As Boolean
 		Get
 			Return Me.theOptionsAutoOpenGmaFileIsChecked
@@ -887,6 +1264,16 @@ Public Class AppSettings
 				Me.theOptionsAutoOpenGmaFileIsChecked = value
 				NotifyPropertyChanged("OptionsAutoOpenGmaFileIsChecked")
 			End If
+		End Set
+	End Property
+
+	Public Property OptionsAutoOpenGmaFileOption() As ActionType
+		Get
+			Return Me.theOptionsAutoOpenGmaFileOption
+		End Get
+		Set(ByVal value As ActionType)
+			Me.theOptionsAutoOpenGmaFileOption = value
+			NotifyPropertyChanged("OptionsAutoOpenGmaFileOption")
 		End Set
 	End Property
 
@@ -977,6 +1364,26 @@ Public Class AppSettings
 		Set(ByVal value As ActionType)
 			Me.theOptionsAutoOpenFolderOption = value
 			NotifyPropertyChanged("OptionsAutoOpenFolderOption")
+		End Set
+	End Property
+
+	Public Property OptionsDragAndDropVpkFileOption() As ActionType
+		Get
+			Return Me.theOptionsDragAndDropVpkFileOption
+		End Get
+		Set(ByVal value As ActionType)
+			Me.theOptionsDragAndDropVpkFileOption = value
+			NotifyPropertyChanged("OptionsDragAndDropVpkFileOption")
+		End Set
+	End Property
+
+	Public Property OptionsDragAndDropGmaFileOption() As ActionType
+		Get
+			Return Me.theOptionsDragAndDropGmaFileOption
+		End Get
+		Set(ByVal value As ActionType)
+			Me.theOptionsDragAndDropGmaFileOption = value
+			NotifyPropertyChanged("OptionsDragAndDropGmaFileOption")
 		End Set
 	End Property
 
@@ -1136,6 +1543,46 @@ Public Class AppSettings
 		End Set
 	End Property
 
+	Public Property UpdateDownloadPath() As String
+		Get
+			Return Me.theUpdateDownloadPath
+		End Get
+		Set(ByVal value As String)
+			Me.theUpdateDownloadPath = value
+			NotifyPropertyChanged("UpdateDownloadPath")
+		End Set
+	End Property
+
+	Public Property UpdateUpdateToNewPathIsChecked() As Boolean
+		Get
+			Return Me.theUpdateUpdateToNewPathIsChecked
+		End Get
+		Set(ByVal value As Boolean)
+			Me.theUpdateUpdateToNewPathIsChecked = value
+			NotifyPropertyChanged("UpdateUpdateToNewPathIsChecked")
+		End Set
+	End Property
+
+	Public Property UpdateUpdateDownloadPath() As String
+		Get
+			Return Me.theUpdateUpdateDownloadPath
+		End Get
+		Set(ByVal value As String)
+			Me.theUpdateUpdateDownloadPath = value
+			NotifyPropertyChanged("UpdateUpdateDownloadPath")
+		End Set
+	End Property
+
+	Public Property UpdateCopySettingsIsChecked() As Boolean
+		Get
+			Return Me.theUpdateCopySettingsIsChecked
+		End Get
+		Set(ByVal value As Boolean)
+			Me.theUpdateCopySettingsIsChecked = value
+			NotifyPropertyChanged("UpdateCopySettingsIsChecked")
+		End Set
+	End Property
+
 #End Region
 
 #Region "Core Event Handlers"
@@ -1144,6 +1591,15 @@ Public Class AppSettings
 
 #Region "Methods"
 
+	Public Sub SetDefaultDownloadOptions()
+		'NOTE: Call the properties so the NotifyPropertyChanged events are raised.
+		Me.DownloadUseItemIdIsChecked = True
+		Me.DownloadPrependItemTitleIsChecked = True
+		Me.DownloadAppendItemUpdateDateTimeIsChecked = True
+		Me.DownloadReplaceSpacesWithUnderscoresIsChecked = True
+		Me.DownloadConvertToExpectedFileOrFolderCheckBoxIsChecked = True
+	End Sub
+
 	Public Sub SetDefaultUnpackOutputSubfolderName()
 		'NOTE: Call the properties so the NotifyPropertyChanged events are raised.
 		Me.UnpackOutputSubfolderName = "unpacked " + My.Application.Info.Version.ToString(2)
@@ -1151,6 +1607,7 @@ Public Class AppSettings
 
 	Public Sub SetDefaultUnpackOptions()
 		'NOTE: Call the properties so the NotifyPropertyChanged events are raised.
+		Me.UnpackFolderForEachPackageIsChecked = False
 		'Me.UnpackExtractIsChecked = False
 		Me.UnpackLogFileIsChecked = False
 	End Sub
@@ -1160,7 +1617,7 @@ Public Class AppSettings
 		Me.DecompileOutputSubfolderName = "decompiled " + My.Application.Info.Version.ToString(2)
 	End Sub
 
-	Public Sub SetDefaultDecompileOptions()
+	Public Sub SetDefaultDecompileReCreateFilesOptions()
 		'NOTE: Call the properties so the NotifyPropertyChanged events are raised.
 		Me.DecompileQcFileIsChecked = True
 		Me.DecompileGroupIntoQciFilesIsChecked = False
@@ -1171,7 +1628,7 @@ Public Class AppSettings
 
 		Me.DecompileReferenceMeshSmdFileIsChecked = True
 		Me.DecompileRemovePathFromSmdMaterialFileNamesIsChecked = True
-		Me.DecompileUseUvsForDoomMusicCompilerIsChecked = False
+		Me.DecompileUseNonValveUvConversionIsChecked = False
 
 		Me.DecompileBoneAnimationSmdFilesIsChecked = True
 		Me.DecompileBoneAnimationPlaceInSubfolderIsChecked = True
@@ -1181,12 +1638,6 @@ Public Class AppSettings
 		Me.DecompilePhysicsMeshSmdFileIsChecked = True
 		Me.DecompileVertexAnimationVtaFileIsChecked = True
 		Me.DecompileProceduralBonesVrdFileIsChecked = True
-
-		'Me.DecompileFolderForEachModelIsChecked = False
-		'Me.DecompileStricterFormatIsChecked = False
-
-		'Me.DecompileLogFileIsChecked = False
-		'Me.DecompileDebugInfoFilesIsChecked = False
 	End Sub
 
 	Public Sub SetDefaultCompileOutputSubfolderName()
@@ -1210,16 +1661,27 @@ Public Class AppSettings
 		Me.CompileOptionsText = ""
 	End Sub
 
+	Public Sub SetDefaultPackOptions()
+		'NOTE: Call the properties so the NotifyPropertyChanged events are raised.
+		Me.PackLogFileIsChecked = False
+
+		Me.PackOptionMultiFileVpkIsChecked = False
+
+		Me.PackOptionsText = ""
+	End Sub
+
 	Public Sub SetDefaultOptionsAutoOpenOptions()
 		'NOTE: Call the properties so the NotifyPropertyChanged events are raised.
 		Me.OptionsAutoOpenVpkFileIsChecked = True
+		Me.OptionsAutoOpenVpkFileOption = ActionType.Unpack
 		Me.OptionsAutoOpenGmaFileIsChecked = True
+		Me.OptionsAutoOpenGmaFileOption = ActionType.Unpack
 		Me.OptionsAutoOpenFpxFileIsChecked = True
 
 		Me.OptionsAutoOpenMdlFileIsChecked = True
-		Me.OptionsAutoOpenMdlFileForPreviewIsChecked = True
+		Me.OptionsAutoOpenMdlFileForPreviewIsChecked = False
 		Me.OptionsAutoOpenMdlFileForDecompileIsChecked = True
-		Me.OptionsAutoOpenMdlFileForViewIsChecked = True
+		Me.OptionsAutoOpenMdlFileForViewIsChecked = False
 		Me.OptionsAutoOpenMdlFileOption = ActionType.Decompile
 
 		Me.OptionsAutoOpenQcFileIsChecked = True
@@ -1230,9 +1692,12 @@ Public Class AppSettings
 	Public Sub SetDefaultOptionsDragAndDropOptions()
 		'NOTE: Call the properties so the NotifyPropertyChanged events are raised.
 
-		Me.OptionsDragAndDropMdlFileForPreviewIsChecked = True
+		Me.OptionsDragAndDropVpkFileOption = ActionType.Unpack
+		Me.OptionsDragAndDropGmaFileOption = ActionType.Unpack
+
+		Me.OptionsDragAndDropMdlFileForPreviewIsChecked = False
 		Me.OptionsDragAndDropMdlFileForDecompileIsChecked = True
-		Me.OptionsDragAndDropMdlFileForViewIsChecked = True
+		Me.OptionsDragAndDropMdlFileForViewIsChecked = False
 		Me.OptionsDragAndDropMdlFileOption = ActionType.Decompile
 
 		Me.OptionsDragAndDropFolderOption = ActionType.Decompile
@@ -1287,17 +1752,30 @@ Public Class AppSettings
 	Private theSteamLibraryPaths As BindingListEx(Of SteamLibraryPath)
 	Private theSetUpGamesGameSetupSelectedIndex As Integer
 
+	' Download tab
+
+	Private theDownloadItemIdOrLink As String
+	Private theDownloadOutputFolderOption As DownloadOutputPathOptions
+	Private theDownloadOutputWorkPath As String
+	Private theDownloadUseItemIdIsChecked As Boolean
+	Private theDownloadPrependItemTitleIsChecked As Boolean
+	Private theDownloadAppendItemUpdateDateTimeIsChecked As Boolean
+	Private theDownloadReplaceSpacesWithUnderscoresIsChecked As Boolean
+	Private theDownloadConvertToExpectedFileOrFolderCheckBoxIsChecked As Boolean
+
 	' Unpack tab
 
 	Private theUnpackContainerType As ContainerType
 	Private theUnpackPackagePathFolderOrFileName As String
 	'Private theUnpackOutputFolderOption As OutputFolderOptions
 	Private theUnpackOutputFolderOption As UnpackOutputPathOptions
+	Private theUnpackOutputSamePath As String
 	Private theUnpackOutputSubfolderName As String
 	Private theUnpackOutputFullPath As String
 	Private theUnpackPackagePathFileName As String
 	Private theUnpackGameSetupSelectedIndex As Integer
 
+	Private theUnpackFolderForEachPackageIsChecked As Boolean
 	'Private theUnpackExtractIsChecked As Boolean
 	Private theUnpackLogFileIsChecked As Boolean
 
@@ -1307,6 +1785,7 @@ Public Class AppSettings
 	' Preview tab
 
 	Private thePreviewMdlPathFileName As String
+	Private thePreviewOverrideMdlVersion As SupportedMdlVersion
 	Private thePreviewGameSetupSelectedIndex As Integer
 
 	Private thePreviewDataViewerIsRunning As Boolean
@@ -1330,7 +1809,7 @@ Public Class AppSettings
 
 	Private theDecompileReferenceMeshSmdFileIsChecked As Boolean
 	Private theDecompileRemovePathFromSmdMaterialFileNamesIsChecked As Boolean
-	Private theDecompileUseUvsForDoomMusicCompilerIsChecked As Boolean
+	Private theDecompileUseNonValveUvConversionIsChecked As Boolean
 
 	Private theDecompileBoneAnimationSmdFilesIsChecked As Boolean
 	Private theDecompileBoneAnimationPlaceInSubfolderIsChecked As Boolean
@@ -1344,9 +1823,10 @@ Public Class AppSettings
 	Private theDecompileDeclareSequenceQciFileIsChecked As Boolean
 
 	Private theDecompileFolderForEachModelIsChecked As Boolean
+	Private theDecompilePrefixFileNamesWithModelNameIsChecked As Boolean
+	Private theDecompileStricterFormatIsChecked As Boolean
 	Private theDecompileLogFileIsChecked As Boolean
 	Private theDecompileDebugInfoFilesIsChecked As Boolean
-	Private theDecompileStricterFormatIsChecked As Boolean
 
 	Private theDecompileOverrideMdlVersion As SupportedMdlVersion
 
@@ -1390,15 +1870,44 @@ Public Class AppSettings
 	' View tab
 
 	Private theViewMdlPathFileName As String
+	Private theViewOverrideMdlVersion As SupportedMdlVersion
 	Private theViewGameSetupSelectedIndex As Integer
 
 	Private theViewDataViewerIsRunning As Boolean
 	Private theViewViewerIsRunning As Boolean
 
+	' Pack tab
+
+	Private thePackMode As PackInputOptions
+	Private thePackInputPathFileName As String
+
+	Private thePackOutputFolderOption As PackOutputPathOptions
+	Private thePackOutputParentPath As String
+	Private thePackOutputPath As String
+
+	Private thePackGameSetupSelectedIndex As Integer
+
+	Private thePackLogFileIsChecked As Boolean
+	Private thePackOptionMultiFileVpkIsChecked As Boolean
+
+	Private thePackOptionsText As String
+
+	Private thePackerIsRunning As Boolean
+
+	' Publish tab
+
+	Private thePublishGameSelectedIndex As Integer
+	Private thePublishSteamAppUserInfos As BindingListExAutoSort(Of SteamAppUserInfo)
+	Private thePublishSearchField As PublishSearchFieldOptions
+	Private thePublishSearchText As String
+	'Private thePublishDragDroppedContentPath As String
+
 	' Options tab
 
 	Private theOptionsAutoOpenVpkFileIsChecked As Boolean
+	Private theOptionsAutoOpenVpkFileOption As ActionType
 	Private theOptionsAutoOpenGmaFileIsChecked As Boolean
+	Private theOptionsAutoOpenGmaFileOption As ActionType
 	Private theOptionsAutoOpenFpxFileIsChecked As Boolean
 
 	Private theOptionsAutoOpenMdlFileIsChecked As Boolean
@@ -1411,6 +1920,9 @@ Public Class AppSettings
 	'Private theOptionsAutoOpenQcFileOption As ActionType
 
 	Private theOptionsAutoOpenFolderOption As ActionType
+
+	Private theOptionsDragAndDropVpkFileOption As ActionType
+	Private theOptionsDragAndDropGmaFileOption As ActionType
 
 	Private theOptionsDragAndDropMdlFileForPreviewIsChecked As Boolean
 	Private theOptionsDragAndDropMdlFileForDecompileIsChecked As Boolean
@@ -1432,6 +1944,13 @@ Public Class AppSettings
 	Private theOptionsCompileQcFileIsChecked As Boolean
 	Private theOptionsCompileFolderIsChecked As Boolean
 	Private theOptionsCompileFolderAndSubfoldersIsChecked As Boolean
+
+	' Update tab
+
+	Private theUpdateDownloadPath As String
+	Private theUpdateUpdateToNewPathIsChecked As Boolean
+	Private theUpdateUpdateDownloadPath As String
+	Private theUpdateCopySettingsIsChecked As Boolean
 
 #End Region
 

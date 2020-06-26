@@ -8,8 +8,6 @@ Public Class CompileUserControl
 	Public Sub New()
 		MyBase.New()
 
-		'Me.Font = New Font(SystemFonts.MessageBoxFont.Name, 8.25)
-
 		' This call is required by the Windows Form Designer.
 		InitializeComponent()
 
@@ -29,7 +27,7 @@ Public Class CompileUserControl
 
 		Me.OutputPathTextBox.DataBindings.Add("Text", TheApp.Settings, "CompileOutputFullPath", False, DataSourceUpdateMode.OnValidation)
 		Me.OutputSubfolderTextBox.DataBindings.Add("Text", TheApp.Settings, "CompileOutputSubfolderName", False, DataSourceUpdateMode.OnValidation)
-		Me.UpdateOutputPathComboBox()
+		Me.InitOutputPathComboBox()
 		Me.UpdateOutputPathWidgets()
 
 		'NOTE: The DataSource, DisplayMember, and ValueMember need to be set before DataBindings, or else an exception is raised.
@@ -54,6 +52,23 @@ Public Class CompileUserControl
 
 		AddHandler Me.QcPathFileNameTextBox.DataBindings("Text").Parse, AddressOf FileManager.ParsePathFileName
 		AddHandler Me.OutputPathTextBox.DataBindings("Text").Parse, AddressOf FileManager.ParsePathFileName
+	End Sub
+
+	Private Sub InitOutputPathComboBox()
+		Dim anEnumList As IList
+
+		anEnumList = EnumHelper.ToList(GetType(CompileOutputPathOptions))
+		Me.OutputPathComboBox.DataBindings.Clear()
+		Try
+			Me.OutputPathComboBox.DisplayMember = "Value"
+			Me.OutputPathComboBox.ValueMember = "Key"
+			Me.OutputPathComboBox.DataSource = anEnumList
+			Me.OutputPathComboBox.DataBindings.Add("SelectedValue", TheApp.Settings, "CompileOutputFolderOption", False, DataSourceUpdateMode.OnPropertyChanged)
+
+			Me.OutputPathComboBox.SelectedIndex = 0
+		Catch ex As Exception
+			Dim debug As Integer = 4242
+		End Try
 	End Sub
 
 	Private Sub InitCrowbarOptions()
@@ -125,6 +140,14 @@ Public Class CompileUserControl
 #End Region
 
 #Region "Widget Event Handlers"
+
+	Private Sub CompileUserControl_Load(sender As Object, e As EventArgs) Handles Me.Load
+		'NOTE: This code prevents Visual Studio often inexplicably extending the right side of these textboxes.
+		Me.QcPathFileNameTextBox.Size = New System.Drawing.Size(Me.BrowseForQcPathFolderOrFileNameButton.Left - Me.BrowseForQcPathFolderOrFileNameButton.Margin.Left - Me.QcPathFileNameTextBox.Margin.Right - Me.QcPathFileNameTextBox.Left, 21)
+		Me.OutputPathTextBox.Size = New System.Drawing.Size(Me.BrowseForOutputPathButton.Left - Me.BrowseForOutputPathButton.Margin.Left - Me.OutputPathTextBox.Margin.Right - Me.OutputPathTextBox.Left, 21)
+		Me.OutputSubfolderTextBox.Size = New System.Drawing.Size(Me.BrowseForOutputPathButton.Left - Me.BrowseForOutputPathButton.Margin.Left - Me.OutputSubfolderTextBox.Margin.Right - Me.OutputSubfolderTextBox.Left, 21)
+		Me.GameModelsOutputPathTextBox.Size = New System.Drawing.Size(Me.BrowseForOutputPathButton.Left - Me.BrowseForOutputPathButton.Margin.Left - Me.GameModelsOutputPathTextBox.Margin.Right - Me.GameModelsOutputPathTextBox.Left, 21)
+	End Sub
 
 #End Region
 
@@ -354,8 +377,10 @@ Public Class CompileUserControl
 			Me.EditCompilerOptionsText("definebones", TheApp.Settings.CompileOptionDefineBonesIsChecked)
 			Me.SetCompilerOptionsText()
 			Me.UpdateCompilerOptionDefineBonesWidgets()
-			'ElseIf e.PropertyName = "CompileOptionDefineBonesCreateFileIsChecked" Then
+		ElseIf e.PropertyName = "CompileOptionDefineBonesCreateFileIsChecked" Then
+			Me.UpdateCompilerOptionDefineBonesWidgets()
 			'ElseIf e.PropertyName = "CompileOptionDefineBonesModifyQcFileIsChecked" Then
+			'	Me.UpdateCompilerOptionDefineBonesWidgets()
 		ElseIf e.PropertyName = "CompileOptionNoP4IsChecked" Then
 			Me.EditCompilerOptionsText("nop4", TheApp.Settings.CompileOptionNoP4IsChecked)
 			Me.SetCompilerOptionsText()
@@ -434,23 +459,6 @@ Public Class CompileUserControl
 	'		End Try
 	'	End If
 	'End Sub
-
-	Private Sub UpdateOutputPathComboBox()
-		Dim anEnumList As IList
-
-		anEnumList = EnumHelper.ToList(GetType(CompileOutputPathOptions))
-		Me.OutputPathComboBox.DataBindings.Clear()
-		Try
-			Me.OutputPathComboBox.DisplayMember = "Value"
-			Me.OutputPathComboBox.ValueMember = "Key"
-			Me.OutputPathComboBox.DataSource = anEnumList
-			Me.OutputPathComboBox.DataBindings.Add("SelectedValue", TheApp.Settings, "CompileOutputFolderOption", False, DataSourceUpdateMode.OnPropertyChanged)
-
-			Me.OutputPathComboBox.SelectedIndex = 0
-		Catch ex As Exception
-			Dim debug As Integer = 4242
-		End Try
-	End Sub
 
 	Private Sub UpdateOutputPathWidgets()
 		Me.GameModelsOutputPathTextBox.Visible = (TheApp.Settings.CompileOutputFolderOption = CompileOutputPathOptions.GameModelsFolder)
@@ -610,7 +618,7 @@ Public Class CompileUserControl
 		Dim previousSelectedInputOption As InputOptions
 
 		anEnumList = EnumHelper.ToList(GetType(InputOptions))
-		previousSelectedInputOption = TheApp.Settings.DecompileMode
+		previousSelectedInputOption = TheApp.Settings.CompileMode
 		Me.CompileComboBox.DataBindings.Clear()
 		Try
 			If File.Exists(TheApp.Settings.CompileQcPathFileName) Then
@@ -632,9 +640,9 @@ Public Class CompileUserControl
 			Me.CompileComboBox.DataBindings.Add("SelectedValue", TheApp.Settings, "CompileMode", False, DataSourceUpdateMode.OnPropertyChanged)
 
 			If EnumHelper.Contains(previousSelectedInputOption, anEnumList) Then
-				Me.CompileComboBox.SelectedIndex = EnumHelper.IndexOf(previousSelectedInputOption, anEnumList)
+				TheApp.Settings.CompileMode = previousSelectedInputOption
 			Else
-				Me.CompileComboBox.SelectedIndex = 0
+				TheApp.Settings.CompileMode = CType(EnumHelper.Key(0, anEnumList), InputOptions)
 			End If
 		Catch ex As Exception
 			Dim debug As Integer = 4242
@@ -674,8 +682,6 @@ Public Class CompileUserControl
 			Me.EditCompilerOptionsText("definebones", False)
 			Me.EditCompilerOptionsText("nop4", False)
 			Me.EditCompilerOptionsText("verbose", False)
-
-			Me.SetCompilerOptionsText()
 		Else
 			Me.CompilerOptionsGoldSourceEnginePanel.Visible = False
 			Me.CompilerOptionsSourceEnginePanel.Visible = True
@@ -683,9 +689,9 @@ Public Class CompileUserControl
 			Me.EditCompilerOptionsText("definebones", TheApp.Settings.CompileOptionDefineBonesIsChecked)
 			Me.EditCompilerOptionsText("nop4", TheApp.Settings.CompileOptionNoP4IsChecked)
 			Me.EditCompilerOptionsText("verbose", TheApp.Settings.CompileOptionVerboseIsChecked)
-
-			Me.SetCompilerOptionsText()
 		End If
+
+		Me.SetCompilerOptionsText()
 	End Sub
 
 	Private Sub EditCompilerOptionsText(ByVal iCompilerOption As String, ByVal optionIsEnabled As Boolean)

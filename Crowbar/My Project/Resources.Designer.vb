@@ -22,7 +22,7 @@ Namespace My.Resources
     '''<summary>
     '''  A strongly-typed resource class, for looking up localized strings, etc.
     '''</summary>
-    <Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0"),  _
+    <Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0"),  _
      Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
      Global.System.Runtime.CompilerServices.CompilerGeneratedAttribute(),  _
      Global.Microsoft.VisualBasic.HideModuleNameAttribute()>  _
@@ -61,6 +61,16 @@ Namespace My.Resources
         End Property
         
         '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Bitmap.
+        '''</summary>
+        Friend ReadOnly Property _26_Grey_PayPal_Pill_Button() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("_26_Grey_PayPal_Pill_Button", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
         '''  Looks up a localized string similar to http://steamcommunity.com/id/zeqmacaw.
         '''</summary>
         Friend ReadOnly Property About_AuthorLink() As String
@@ -88,11 +98,23 @@ Namespace My.Resources
         End Property
         
         '''<summary>
-        '''  Looks up a localized string similar to GoldSource and Source Engine Model Toolset:
-        '''	* Decompiler of MDL and related files.
-        '''	* Compiler interface to StudioMDL.exe tool.
-        '''	* Model viewer interface to Half-Life Model Viewer tool.
-        '''	* Unpacker of Tactical Intervention FPX, Garry&apos;s Mod GMA, and Source-engine VPK package files..
+        '''  Looks up a localized string similar to http://paypal.me/zeqmacaw.
+        '''</summary>
+        Friend ReadOnly Property About_PayPalLink() As String
+            Get
+                Return ResourceManager.GetString("About_PayPalLink", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized string similar to GoldSource and Source Engine Modding Toolset:
+        '''* Decompiler of MDL and related files.
+        '''* Compiler interface to StudioMDL.exe tool.
+        '''* Model viewer interface to Half-Life Model Viewer tool.
+        '''* Unpacker of Fairy Tale Busters APK, Tactical Intervention FPX, Garry&apos;s Mod GMA, Vampire: The Masquerade - Bloodlines VPK files, and Source-engine VPK files.
+        '''* Packer interface to Garry&apos;s Mod GMA and Source-engine VPK packer tools.
+        '''* Downloader of Workshop items from any Steam game that allows public downloads.
+        '''* Pub [rest of string was truncated]&quot;;.
         '''</summary>
         Friend ReadOnly Property About_ProductDescription() As String
             Get
@@ -119,6 +141,35 @@ Namespace My.Resources
         End Property
         
         '''<summary>
+        '''  Looks up a localized string similar to https://steamcommunity.com/groups/CrowbarTool/discussions/1/.
+        '''</summary>
+        Friend ReadOnly Property BugReportLink1() As String
+            Get
+                Return ResourceManager.GetString("BugReportLink1", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Bitmap.
+        '''</summary>
+        Friend ReadOnly Property CancelRefresh() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("CancelRefresh", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Bitmap.
+        '''</summary>
+        Friend ReadOnly Property CancelSearch() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("CancelSearch", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         '''</summary>
         Friend ReadOnly Property crowbar_icon() As System.Drawing.Icon
@@ -139,12 +190,39 @@ Namespace My.Resources
         End Property
         
         '''<summary>
+        '''  Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+        '''&lt;AppSettings xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xmlns:xsd=&quot;http://www.w3.org/2001/XMLSchema&quot;&gt;
+        '''  &lt;GameSetups&gt;
+        '''    &lt;GameSetup&gt;
+        '''      &lt;GameName&gt;Age of Chivalry&lt;/GameName&gt;
+        '''      &lt;GameEngine&gt;Source&lt;/GameEngine&gt;
+        '''      &lt;GamePathFileName&gt;&amp;lt;library1&amp;gt;\steamapps\common\Source SDK Base 2007\ageofchivalry\gameinfo.txt&lt;/GamePathFileName&gt;
+        '''      &lt;GameAppPathFileName&gt;&amp;lt;library1&amp;gt;\steamapps\common\Source SDK Base 2007\hl2.exe&lt;/GameAppPathFileName&gt;
+        '''    [rest of string was truncated]&quot;;.
+        '''</summary>
+        Friend ReadOnly Property Crowbar_Settings() As String
+            Get
+                Return ResourceManager.GetString("Crowbar_Settings", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
         Friend ReadOnly Property CrowbarGuideBanner() As System.Drawing.Bitmap
             Get
                 Dim obj As Object = ResourceManager.GetObject("CrowbarGuideBanner", resourceCulture)
                 Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Byte[].
+        '''</summary>
+        Friend ReadOnly Property CrowbarLauncher() As Byte()
+            Get
+                Dim obj As Object = ResourceManager.GetObject("CrowbarLauncher", resourceCulture)
+                Return CType(obj,Byte())
             End Get
         End Property
         
@@ -279,6 +357,25 @@ Namespace My.Resources
         End Property
         
         '''<summary>
+        '''  Looks up a localized string similar to https://steamcommunity.com/sharedfiles/workshoplegalagreement.
+        '''</summary>
+        Friend ReadOnly Property Link_SteamSubscriberAgreement() As String
+            Get
+                Return ResourceManager.GetString("Link_SteamSubscriberAgreement", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Byte[].
+        '''</summary>
+        Friend ReadOnly Property lzma() As Byte()
+            Get
+                Dim obj As Object = ResourceManager.GetObject("lzma", resourceCulture)
+                Return CType(obj,Byte())
+            End Get
+        End Property
+        
+        '''<summary>
         '''  Looks up a localized resource of type System.Drawing.Bitmap.
         '''</summary>
         Friend ReadOnly Property macaw() As System.Drawing.Bitmap
@@ -299,11 +396,61 @@ Namespace My.Resources
         End Property
         
         '''<summary>
+        '''  Looks up a localized resource of type System.Byte[].
+        '''</summary>
+        Friend ReadOnly Property SevenZr() As Byte()
+            Get
+                Dim obj As Object = ResourceManager.GetObject("SevenZr", resourceCulture)
+                Return CType(obj,Byte())
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Byte[].
+        '''</summary>
+        Friend ReadOnly Property steam_api() As Byte()
+            Get
+                Dim obj As Object = ResourceManager.GetObject("steam_api", resourceCulture)
+                Return CType(obj,Byte())
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Byte[].
+        '''</summary>
+        Friend ReadOnly Property Steamworks_NET() As Byte()
+            Get
+                Dim obj As Object = ResourceManager.GetObject("Steamworks_NET", resourceCulture)
+                Return CType(obj,Byte())
+            End Get
+        End Property
+        
+        '''<summary>
         '''  Looks up a localized string similar to unpack-log.txt.
         '''</summary>
         Friend ReadOnly Property Unpack_LogFileNameSuffix() As String
             Get
                 Return ResourceManager.GetString("Unpack_LogFileNameSuffix", resourceCulture)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Bitmap.
+        '''</summary>
+        Friend ReadOnly Property WordWrap() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("WordWrap", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
+            End Get
+        End Property
+        
+        '''<summary>
+        '''  Looks up a localized resource of type System.Drawing.Bitmap.
+        '''</summary>
+        Friend ReadOnly Property WordWrapOff() As System.Drawing.Bitmap
+            Get
+                Dim obj As Object = ResourceManager.GetObject("WordWrapOff", resourceCulture)
+                Return CType(obj,System.Drawing.Bitmap)
             End Get
         End Property
     End Module

@@ -334,26 +334,6 @@ Public Class FileManager
 		End Try
 	End Sub
 
-	Public Shared Function OutputPathIsUsable(ByVal outputPath As String) As Boolean
-		Dim result As Boolean
-
-		result = True
-		If Not Directory.Exists(outputPath) Then
-			Try
-				Directory.CreateDirectory(outputPath)
-				If Not Directory.Exists(outputPath) Then
-					' Unable to create folder.
-					result = False
-				End If
-			Catch e As Exception
-				' Unable to create folder.
-				result = False
-			End Try
-		End If
-
-		Return result
-	End Function
-
 	Public Shared Function PathExistsAfterTryToCreate(ByVal aPath As String) As Boolean
 		If Not Directory.Exists(aPath) Then
 			Try
@@ -364,20 +344,20 @@ Public Class FileManager
 		Return Directory.Exists(aPath)
 	End Function
 
-	'Private Shared Function GetFullPath(maybeRelativePath As String, baseDirectory As String) As String
-	'	If baseDirectory Is Nothing Then
-	'		baseDirectory = Environment.CurrentDirectory
-	'	End If
+	Private Shared Function GetFullPath(maybeRelativePath As String, baseDirectory As String) As String
+		If baseDirectory Is Nothing Then
+			baseDirectory = Environment.CurrentDirectory
+		End If
 
-	'	Dim root As String = Path.GetPathRoot(maybeRelativePath)
-	'	If String.IsNullOrEmpty(root) Then
-	'		Return Path.GetFullPath(Path.Combine(baseDirectory, maybeRelativePath))
-	'	ElseIf root = "\" Then
-	'		Return Path.GetFullPath(Path.Combine(Path.GetPathRoot(baseDirectory), maybeRelativePath.Remove(0, 1)))
-	'	End If
+		Dim root As String = Path.GetPathRoot(maybeRelativePath)
+		If String.IsNullOrEmpty(root) Then
+			Return Path.GetFullPath(Path.Combine(baseDirectory, maybeRelativePath))
+		ElseIf root = "\" Then
+			Return Path.GetFullPath(Path.Combine(Path.GetPathRoot(baseDirectory), maybeRelativePath.Remove(0, 1)))
+		End If
 
-	'	Return maybeRelativePath
-	'End Function
+		Return maybeRelativePath
+	End Function
 
 	Public Shared Function GetRelativePathFileName(ByVal fromPath As String, ByVal toPathFileName As String) As String
 		Dim fromPathAbsolute As String
@@ -404,7 +384,24 @@ Public Class FileManager
 		Return cleanedPath
 	End Function
 
-    Public Shared Function GetCleanPathFileName(ByVal givenPathFileName As String, ByVal returnFullPathFileName As Boolean) As String
+	Public Shared Function GetCleanPath(ByVal givenPath As String, ByVal returnFullPath As Boolean) As String
+		Dim cleanPath As String
+		cleanPath = givenPath
+		For Each invalidChar As Char In Path.GetInvalidPathChars()
+			cleanPath = cleanPath.Replace(invalidChar, "")
+		Next
+		If returnFullPath Then
+			Try
+				cleanPath = Path.GetFullPath(cleanPath)
+			Catch ex As Exception
+				cleanPath = cleanPath.Replace(":", "")
+			End Try
+		End If
+
+		Return cleanPath
+	End Function
+
+	Public Shared Function GetCleanPathFileName(ByVal givenPathFileName As String, ByVal returnFullPathFileName As Boolean) As String
         Dim cleanPathFileName As String
 
         Dim cleanedPathGivenPathFileName As String
@@ -438,7 +435,16 @@ Public Class FileManager
         Return cleanPathFileName
     End Function
 
-    Public Shared Sub ParsePathFileName(ByVal sender As Object, ByVal e As ConvertEventArgs)
+	Public Shared Sub ParsePath(ByVal sender As Object, ByVal e As ConvertEventArgs)
+		If e.DesiredType IsNot GetType(String) Then
+			Exit Sub
+		End If
+		If CStr(e.Value) <> "" Then
+			e.Value = FileManager.GetCleanPath(CStr(e.Value), True)
+		End If
+	End Sub
+
+	Public Shared Sub ParsePathFileName(ByVal sender As Object, ByVal e As ConvertEventArgs)
 		If e.DesiredType IsNot GetType(String) Then
 			Exit Sub
 		End If
@@ -456,6 +462,28 @@ Public Class FileManager
 		End If
 
 		Return cleanPathFileName
+	End Function
+
+	Public Shared Function GetTestedPathFileName(ByVal iPathFileName As String) As String
+		Dim testedPathFileName As String = iPathFileName
+		Dim pathFileNameWithoutExtension As String = FileManager.GetPathFileNameWithoutExtension(iPathFileName)
+		Dim extension As String = Path.GetExtension(iPathFileName)
+		Dim number As Integer = 1
+		While File.Exists(testedPathFileName)
+			testedPathFileName = pathFileNameWithoutExtension + "(" + number.ToString() + ")" + extension
+			number += 1
+		End While
+		Return testedPathFileName
+	End Function
+
+	Public Shared Function GetTestedPath(ByVal iPath As String) As String
+		Dim testedPathFileName As String = iPath
+		Dim number As Integer = 1
+		While Directory.Exists(testedPathFileName)
+			testedPathFileName = iPath + "(" + number.ToString() + ")"
+			number += 1
+		End While
+		Return testedPathFileName
 	End Function
 
 	Public Shared Function GetLongestExtantPath(ByVal iPath As String, Optional ByRef topNonextantPath As String = "") As String
@@ -573,6 +601,18 @@ Public Class FileManager
 		Next
 	End Sub
 
+	Public Shared Function GetFolderSize(ByVal aFolder As String) As ULong
+		Dim size As ULong
+		Dim FolderInfo As DirectoryInfo = New IO.DirectoryInfo(aFolder)
+		For Each File As FileInfo In FolderInfo.GetFiles
+			size += CULng(File.Length)
+		Next
+		For Each SubFolderInfo As DirectoryInfo In FolderInfo.GetDirectories
+			size += GetFolderSize(SubFolderInfo.FullName)
+		Next
+		Return size
+	End Function
+
 #End Region
 
 #Region "XML Serialization"
@@ -644,7 +684,14 @@ Public Class FileManager
 	End Sub
 
 	Public Shared Sub WriteXml(ByVal iObject As Object, ByVal x As XmlSerializer, ByVal fileName As String)
-		Dim objStreamWriter As New StreamWriter(fileName)
+		'Dim objStreamWriter As New StreamWriter(fileName)
+		'NOTE: Use Xml.XmlWriterSettings to preserve CRLF line endings used by multi-line textboxes.
+		Dim settings As Xml.XmlWriterSettings = New Xml.XmlWriterSettings()
+		settings.Indent = True
+		settings.IndentChars = (ControlChars.Tab)
+		settings.OmitXmlDeclaration = False
+		settings.NewLineHandling = Xml.NewLineHandling.Entitize
+		Dim objStreamWriter As Xml.XmlWriter = Xml.XmlWriter.Create(fileName, settings)
 		x.Serialize(objStreamWriter, iObject)
 		objStreamWriter.Close()
 	End Sub

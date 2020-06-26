@@ -24,7 +24,7 @@ Partial Class UnhandledExceptionWindow
 		Me.CopyErrorReportButton = New System.Windows.Forms.Button()
 		Me.LinkLabel1 = New System.Windows.Forms.LinkLabel()
 		Me.Label1 = New System.Windows.Forms.Label()
-		Me.ErrorReportTextBox = New System.Windows.Forms.TextBox()
+		Me.ErrorReportTextBox = New TextBoxEx()
 		Me.SuspendLayout()
 		'
 		'ExitButton
@@ -103,6 +103,6 @@ Partial Class UnhandledExceptionWindow
 	Friend WithEvents CopyErrorReportButton As System.Windows.Forms.Button
 	Friend WithEvents LinkLabel1 As System.Windows.Forms.LinkLabel
 	Friend WithEvents Label1 As System.Windows.Forms.Label
-	Friend WithEvents ErrorReportTextBox As System.Windows.Forms.TextBox
+	Friend WithEvents ErrorReportTextBox As TextBoxEx
 
 End Class

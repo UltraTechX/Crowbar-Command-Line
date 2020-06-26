@@ -177,6 +177,8 @@ Public Class Compiler
 			Me.WriteErrorMessage(1, "The model compiler, """ + gameCompilerPathFileName + """, does not exist.")
 			Me.UpdateProgress(1, My.Resources.ErrorMessageSDKMissingCause)
 		End If
+		'TODO: [CompilerInputsAreValid] If GoldSource, then only check for liblist.gam if output is for game's "models" folder.
+		'TODO: [CompilerInputsAreValid] Change error message to include "liblist.gam" or "gameinfo.txt" as appropriate.
 		If Not File.Exists(gamePathFileName) Then
 			inputsAreValid = False
 			Me.WriteErrorMessage(1, "The game's """ + gamePathFileName + """ file does not exist.")
@@ -201,7 +203,7 @@ Public Class Compiler
 		End If
 		'If TheApp.Settings.CompileOutputFolderIsChecked Then
 		If TheApp.Settings.CompileOutputFolderOption <> CompileOutputPathOptions.GameModelsFolder Then
-			If Not FileManager.OutputPathIsUsable(Me.theOutputPath) Then
+			If Not FileManager.PathExistsAfterTryToCreate(Me.theOutputPath) Then
 				inputsAreValid = False
 				Me.WriteErrorMessage(1, "The Output Folder, """ + Me.theOutputPath + """ could not be created.")
 			End If
@@ -391,6 +393,10 @@ Public Class Compiler
 					'	qcModelTopFolderPath = Path.GetFullPath(qcModelTopFolderPath)
 					'End If
 				End If
+
+				If Path.GetExtension(compiledMdlPathFileName) <> ".mdl" Then
+					compiledMdlPathFileName = Path.ChangeExtension(compiledMdlPathFileName, ".mdl")
+				End If
 			Catch ex As Exception
 				compiledMdlPathFileName = ""
 			End Try
@@ -422,50 +428,55 @@ Public Class Compiler
 			Me.UpdateProgress()
 			Me.UpdateProgress(1, "Compiling """ + qcRelativePathFileName + """ ...")
 
-			If TheApp.Settings.CompileOptionDefineBonesIsChecked AndAlso TheApp.Settings.CompileOptionDefineBonesCreateFileIsChecked Then
-				Me.OpenDefineBonesFile()
-			End If
+			Dim result As String
+			result = Me.CheckFiles()
+			If result = "success" Then
+				If TheApp.Settings.CompileOptionDefineBonesIsChecked AndAlso TheApp.Settings.CompileOptionDefineBonesCreateFileIsChecked Then
+					Me.OpenDefineBonesFile()
+				End If
 
-			Me.UpdateProgress(2, "Output from compiler """ + Me.GetGameCompilerPathFileName() + """: ")
-			Me.RunStudioMdlApp(qcPath, qcFileName)
+				Me.UpdateProgress(2, "Output from compiler """ + Me.GetGameCompilerPathFileName() + """: ")
+				Me.RunStudioMdlApp(qcPath, qcFileName)
 
-			If Not Me.theProcessHasOutputData Then
-				Me.UpdateProgress(2, "ERROR: The compiler did not return any status messages.")
-				Me.UpdateProgress(2, "CAUSE: The compiler is not the correct one for the selected game.")
-				Me.UpdateProgress(2, "SOLUTION: Verify integrity of game files via Steam so that the correct compiler is installed.")
-			ElseIf TheApp.Settings.CompileOptionDefineBonesIsChecked Then
-				If Me.theDefineBonesFileStream IsNot Nothing Then
-					If TheApp.Settings.CompileOptionDefineBonesModifyQcFileIsChecked Then
-						Me.InsertAnIncludeDefineBonesFileCommandIntoQcFile()
+				If Not Me.theProcessHasOutputData Then
+					Me.UpdateProgress(2, "ERROR: The compiler did not return any status messages.")
+					Me.UpdateProgress(2, "CAUSE: The compiler is not the correct one for the selected game.")
+					Me.UpdateProgress(2, "SOLUTION: Verify integrity of game files via Steam so that the correct compiler is installed.")
+				ElseIf gameSetup.GameEngine = GameEngine.Source AndAlso TheApp.Settings.CompileOptionDefineBonesIsChecked Then
+					If Me.theDefineBonesFileStream IsNot Nothing Then
+						If TheApp.Settings.CompileOptionDefineBonesModifyQcFileIsChecked Then
+							Me.InsertAnIncludeDefineBonesFileCommandIntoQcFile()
+						End If
+
+						Me.CloseDefineBonesFile()
 					End If
-
-					Me.CloseDefineBonesFile()
+				Else
+					If File.Exists(compiledMdlPathFileName) Then
+						Me.ProcessCompiledModel(compiledMdlPathFileName, qcModelName)
+					End If
 				End If
-			Else
-				If File.Exists(compiledMdlPathFileName) Then
-					Me.ProcessCompiledModel(compiledMdlPathFileName, qcModelName)
-				End If
-			End If
 
-			' Clean up any created folders.
-			'If qcModelTopFolderPath <> "" Then
-			'	Dim fullPathDeleted As String
-			'	fullPathDeleted = FileManager.DeleteEmptySubpath(qcModelTopFolderPath)
-			'	If fullPathDeleted <> "" Then
-			'		Me.UpdateProgress(2, "Crowbar: Deleted empty temporary compile folder """ + fullPathDeleted + """")
-			'	End If
-			'End If
-			'------
-			If qcModelTopNonextantPath <> "" Then
-				Dim fullPathDeleted As String
-				fullPathDeleted = FileManager.DeleteEmptySubpath(qcModelTopNonextantPath)
-				If fullPathDeleted <> "" Then
-					Me.UpdateProgress(2, "Crowbar: Deleted empty temporary compile folder """ + fullPathDeleted + """")
+				' Clean up any created folders.
+				'If qcModelTopFolderPath <> "" Then
+				'	Dim fullPathDeleted As String
+				'	fullPathDeleted = FileManager.DeleteEmptySubpath(qcModelTopFolderPath)
+				'	If fullPathDeleted <> "" Then
+				'		Me.UpdateProgress(2, "Crowbar: Deleted empty temporary compile folder """ + fullPathDeleted + """")
+				'	End If
+				'End If
+				'------
+				If qcModelTopNonextantPath <> "" Then
+					Dim fullPathDeleted As String
+					fullPathDeleted = FileManager.DeleteEmptySubpath(qcModelTopNonextantPath)
+					If fullPathDeleted <> "" Then
+						Me.UpdateProgress(2, "CROWBAR: Deleted empty temporary compile folder """ + fullPathDeleted + """.")
+					End If
 				End If
 			End If
 
 			Me.UpdateProgress(1, "... Compiling """ + qcRelativePathFileName + """ finished. Check above for any errors.")
 		Catch ex As Exception
+			'TODO: [CompileOneModel] Should at least give an error message to let user know something prevented the compile.
 			Dim debug As Integer = 4242
 			'Finally
 			'	If Me.theLogFileStream IsNot Nothing Then
@@ -474,7 +485,15 @@ Public Class Compiler
 			'	End If
 		End Try
 
-			Return status
+		Return status
+	End Function
+
+	Private Function CheckFiles() As String
+		Dim result As String = "success"
+
+		'TODO: Implement counting of all materials used in all mesh SMD files, excluding the phy mesh.
+
+		Return result
 	End Function
 
 	Private Sub RunStudioMdlApp(ByVal qcPath As String, ByVal qcFileName As String)
@@ -565,8 +584,7 @@ Public Class Compiler
 		Dim modelsSubpath As String
 		Dim targetPath As String
 
-		Dim gameSetup As GameSetup
-		gameSetup = TheApp.Settings.GameSetups(TheApp.Settings.CompileGameSetupSelectedIndex)
+		Dim gameSetup As GameSetup = TheApp.Settings.GameSetups(TheApp.Settings.CompileGameSetupSelectedIndex)
 
 		sourcePath = FileManager.GetPath(compiledMdlPathFileName)
 		sourceFileNameWithoutExtension = Path.GetFileNameWithoutExtension(compiledMdlPathFileName)
@@ -607,7 +625,7 @@ Public Class Compiler
 				End Try
 				Try
 					File.Move(sourcePathFileName, targetPathFileName)
-					Me.UpdateProgress(2, "Crowbar: Moved compiled model file """ + sourcePathFileName + """ to """ + targetPath + """")
+					Me.UpdateProgress(2, "CROWBAR: Moved compiled model file """ + sourcePathFileName + """ to """ + targetPath + """")
 				Catch ex As Exception
 					Me.UpdateProgress()
 					Me.UpdateProgress(2, "WARNING: Crowbar tried to move the file, """ + sourcePathFileName + """, to the output folder, but Windows complained with this message: " + ex.Message.Trim())

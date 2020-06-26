@@ -28,4 +28,24 @@
 		Me.Validate()
 	End Sub
 
+	'' Reduce flicker and/or speed of redraw when resizing main window, partiularly in Win7 Aero mode.
+	''NOTE: This has side-effect of not updating Unpack listview splitcontainer panel and does not show dragging of any splitcontainer splitter bars.
+	'Protected Overrides ReadOnly Property CreateParams() As CreateParams
+	'	Get
+	'		Dim cp As CreateParams = MyBase.CreateParams
+	'		cp.ExStyle = cp.ExStyle Or &H2000000
+	'		Return cp
+	'	End Get
+	'End Property 'CreateParams
+
+	'Protected Overrides Sub OnResizeBegin(ByVal e As EventArgs)
+	'	SuspendLayout()
+	'	MyBase.OnResizeBegin(e)
+	'End Sub
+
+	'Protected Overrides Sub OnResizeEnd(ByVal e As EventArgs)
+	'	ResumeLayout()
+	'	MyBase.OnResizeEnd(e)
+	'End Sub
+
 End Class

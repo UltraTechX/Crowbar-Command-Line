@@ -4,7 +4,7 @@ Imports System.Text
 
 Public Class MainForm
 
-#Region "Creation and Destruction"
+#Region "Create and Destroy"
 
 	Public Sub New()
 		MyBase.New()
@@ -32,6 +32,10 @@ Public Class MainForm
 			Me.Location = TheApp.Settings.WindowLocation
 			Me.Size = TheApp.Settings.WindowSize
 			Me.WindowState = TheApp.Settings.WindowState
+
+			If TheApp.CommandLineOption_Settings_IsEnabled Then
+				TheApp.Settings.MainWindowSelectedTabIndex = Me.MainTabControl.TabPages.IndexOf(Me.UpdateTabPage)
+			End If
 			Me.MainTabControl.SelectedIndex = TheApp.Settings.MainWindowSelectedTabIndex
 
 			Dim aScreen As Screen
@@ -68,7 +72,6 @@ Public Class MainForm
 		Dim commandLineValues As New ReadOnlyCollection(Of String)(System.Environment.GetCommandLineArgs())
 		Me.Startup(commandLineValues)
 
-		Me.UnpackUserControl1.RunUnpackerToGetListOfPackageContents()
 		Me.PreviewViewUserControl.RunDataViewer()
 		Me.ViewViewUserControl.RunDataViewer()
 
@@ -76,7 +79,7 @@ Public Class MainForm
 		AddHandler Me.UnpackUserControl1.UseAllInDecompileButton.Click, AddressOf Me.UnpackUserControl_UseAllInDecompileButton_Click
 		AddHandler Me.UnpackUserControl1.UseInPreviewButton.Click, AddressOf Me.UnpackUserControl_UseInPreviewButton_Click
 		AddHandler Me.UnpackUserControl1.UseInDecompileButton.Click, AddressOf Me.UnpackUserControl_UseInDecompileButton_Click
-		AddHandler Me.PreviewViewUserControl.EditGameSetupButton.Click, AddressOf Me.PreviewSetUpGamesButton_Click
+		AddHandler Me.PreviewViewUserControl.SetUpGameButton.Click, AddressOf Me.PreviewSetUpGamesButton_Click
 		AddHandler Me.PreviewViewUserControl.UseInDecompileButton.Click, AddressOf Me.ViewUserControl_UseInDecompileButton_Click
 		AddHandler Me.DecompilerUserControl1.UseAllInCompileButton.Click, AddressOf Me.DecompilerUserControl1_UseAllInCompileButton_Click
 		'AddHandler Me.DecompilerUserControl1.UseInEditButton.Click, AddressOf Me.DecompilerUserControl1_UseInEditButton_Click
@@ -85,8 +88,13 @@ Public Class MainForm
 		'AddHandler Me.CompilerUserControl1.UseAllInPackButton.Click, AddressOf Me.CompilerUserControl1_UseAllInPackButton_Click
 		AddHandler Me.CompilerUserControl1.UseInViewButton.Click, AddressOf Me.CompilerUserControl1_UseInViewButton_Click
 		'AddHandler Me.CompilerUserControl1.UseInPackButton.Click, AddressOf Me.CompilerUserControl1_UseInPackButton_Click
-		AddHandler Me.ViewViewUserControl.EditGameSetupButton.Click, AddressOf Me.ViewSetUpGamesButton_Click
+		AddHandler Me.ViewViewUserControl.SetUpGameButton.Click, AddressOf Me.ViewSetUpGamesButton_Click
 		AddHandler Me.ViewViewUserControl.UseInDecompileButton.Click, AddressOf Me.ViewUserControl_UseInDecompileButton_Click
+		AddHandler Me.PackUserControl1.SetUpGamesButton.Click, AddressOf Me.PackSetUpGamesButton_Click
+		AddHandler Me.PublishUserControl1.UseInDownloadToolStripMenuItem.Click, AddressOf Me.PublishUserControl1_UseInDownloadToolStripMenuItem_Click
+		AddHandler Me.UpdateUserControl1.UpdateAvailable, AddressOf Me.UpdateUserControl1_UpdateAvailable
+
+		Me.UpdateUserControl1.CheckForUpdate()
 	End Sub
 
 	Private Sub Free()
@@ -94,7 +102,7 @@ Public Class MainForm
 		RemoveHandler Me.UnpackUserControl1.UseAllInDecompileButton.Click, AddressOf Me.UnpackUserControl_UseAllInDecompileButton_Click
 		RemoveHandler Me.UnpackUserControl1.UseInPreviewButton.Click, AddressOf Me.UnpackUserControl_UseInPreviewButton_Click
 		RemoveHandler Me.UnpackUserControl1.UseInDecompileButton.Click, AddressOf Me.UnpackUserControl_UseInDecompileButton_Click
-		RemoveHandler Me.PreviewViewUserControl.EditGameSetupButton.Click, AddressOf Me.PreviewSetUpGamesButton_Click
+		RemoveHandler Me.PreviewViewUserControl.SetUpGameButton.Click, AddressOf Me.PreviewSetUpGamesButton_Click
 		RemoveHandler Me.PreviewViewUserControl.UseInDecompileButton.Click, AddressOf Me.ViewUserControl_UseInDecompileButton_Click
 		RemoveHandler Me.DecompilerUserControl1.UseAllInCompileButton.Click, AddressOf Me.DecompilerUserControl1_UseAllInCompileButton_Click
 		'RemoveHandler Me.DecompilerUserControl1.UseInEditButton.Click, AddressOf Me.DecompilerUserControl1_UseInEditButton_Click
@@ -103,8 +111,11 @@ Public Class MainForm
 		'RemoveHandler Me.CompilerUserControl1.UseAllInPackButton.Click, AddressOf Me.CompilerUserControl1_UseAllInPackButton_Click
 		RemoveHandler Me.CompilerUserControl1.UseInViewButton.Click, AddressOf Me.CompilerUserControl1_UseInViewButton_Click
 		'RemoveHandler Me.CompilerUserControl1.UseInPackButton.Click, AddressOf Me.CompilerUserControl1_UseInPackButton_Click
-		RemoveHandler Me.ViewViewUserControl.EditGameSetupButton.Click, AddressOf Me.ViewSetUpGamesButton_Click
+		RemoveHandler Me.ViewViewUserControl.SetUpGameButton.Click, AddressOf Me.ViewSetUpGamesButton_Click
 		RemoveHandler Me.ViewViewUserControl.UseInDecompileButton.Click, AddressOf Me.ViewUserControl_UseInDecompileButton_Click
+		RemoveHandler Me.PackUserControl1.SetUpGamesButton.Click, AddressOf Me.PackSetUpGamesButton_Click
+		RemoveHandler Me.PublishUserControl1.UseInDownloadToolStripMenuItem.Click, AddressOf Me.PublishUserControl1_UseInDownloadToolStripMenuItem_Click
+		RemoveHandler Me.UpdateUserControl1.UpdateAvailable, AddressOf Me.UpdateUserControl1_UpdateAvailable
 
 		If Me.WindowState = FormWindowState.Normal Then
 			TheApp.Settings.WindowLocation = Me.Location
@@ -126,15 +137,18 @@ Public Class MainForm
 #Region "Methods"
 
 	Public Sub Startup(ByVal commandLineValues As ReadOnlyCollection(Of String))
-		If commandLineValues.Count > 1 AndAlso commandLineValues(1) <> "" Then
-			Me.SetDroppedPathFileName(True, commandLineValues(1))
+		If commandLineValues.Count > 1 Then
+			Dim command As String = commandLineValues(1)
+			If command <> "" AndAlso Not TheApp.CommandLineValueIsAnAppSetting(command) Then
+				Me.SetDroppedPathFileName(True, command)
 
-			''TEST: Every file selected and dropped onto EXE is a string in the array, starting at index 1. Index 0 is the EXE path file name.
-			'Dim text As New StringBuilder()
-			'For Each arg As String In commandLineParams
-			'	text.AppendLine(arg)
-			'Next
-			'MessageBox.Show(text.ToString())
+				''TEST: Every file selected and dropped onto EXE is a string in the array, starting at index 1. Index 0 is the EXE path file name.
+				'Dim text As New StringBuilder()
+				'For Each arg As String In commandLineParams
+				'	text.AppendLine(arg)
+				'Next
+				'MessageBox.Show(text.ToString())
+			End If
 		End If
 	End Sub
 
@@ -157,12 +171,33 @@ Public Class MainForm
 	Private Sub MainForm_DragEnter(ByVal sender As System.Object, ByVal e As System.Windows.Forms.DragEventArgs) Handles MyBase.DragEnter
 		If e.Data.GetDataPresent(DataFormats.FileDrop) Then
 			e.Effect = DragDropEffects.Copy
+		ElseIf e.Data.GetDataPresent(DataFormats.Html) Then
+			e.Effect = DragDropEffects.Copy
 		End If
 	End Sub
 
 	Private Sub MainForm_DragDrop(ByVal sender As System.Object, ByVal e As System.Windows.Forms.DragEventArgs) Handles MyBase.DragDrop
-		Dim pathFileNames() As String = CType(e.Data.GetData(DataFormats.FileDrop), String())
-		Me.SetDroppedPathFileName(False, pathFileNames(0))
+		'NOTE: Multiple pathFileNames is filled with all selected file names from Windows Explorer.
+		If e.Data.GetDataPresent(DataFormats.FileDrop) Then
+			Dim pathFileNames() As String = CType(e.Data.GetData(DataFormats.FileDrop), String())
+			Me.SetDroppedPathFileName(False, pathFileNames(0))
+		ElseIf e.Data.GetDataPresent(DataFormats.Text) Then
+			Dim urlText As String = CType(e.Data.GetData(DataFormats.Text), String)
+			Me.SetDroppedUrlText(False, urlText)
+			'ElseIf e.Data.GetDataPresent(DataFormats.Html) Then
+			'	'Version:0.9
+			'	'StartHTML:00000145
+			'	'EndHTML:00000392
+			'	'StartFragment:00000179
+			'	'EndFragment:00000356
+			'	'SourceURL:chrome://browser/content/browser.xul
+			'	'<html><body>
+			'	'<!--StartFragment--><a href="https://steamcommunity.com/sharedfiles/filedetails/?id=1777079625&tscn=1561212913">https://steamcommunity.com/sharedfiles/filedetails/?id=1777079625&tscn=1561212913</a><!--EndFragment-->
+			'	'</body>
+			'	'</html>
+			'	Dim urlText As String = CType(e.Data.GetData(DataFormats.Html).ToString(), String)
+			'	Me.SetDroppedPathFileName(False, urlText)
+		End If
 	End Sub
 
 #End Region
@@ -240,6 +275,23 @@ Public Class MainForm
 		Me.MainTabControl.SelectTab(Me.DecompileTabPage)
 	End Sub
 
+	Private Sub PackSetUpGamesButton_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
+		Me.theTabThatCalledSetUpGames = Me.PackTabPage
+		Me.SelectSetUpGamesFromAnotherTab(TheApp.Settings.PackGameSetupSelectedIndex)
+	End Sub
+
+	Private Sub PublishUserControl1_UseInDownloadToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs)
+		Me.MainTabControl.SelectTab(Me.DownloadTabPage)
+	End Sub
+
+	Private Sub UpdateUserControl1_UpdateAvailable(ByVal sender As System.Object, ByVal e As UpdateUserControl.UpdateAvailableEventArgs)
+		If e.UpdateIsAvailable Then
+			Me.UpdateTabPage.Text = "Update Available"
+		Else
+			Me.UpdateTabPage.Text = "Update"
+		End If
+	End Sub
+
 #End Region
 
 #Region "Core Event Handlers"
@@ -251,32 +303,68 @@ Public Class MainForm
 	Private Sub SetDroppedPathFileName(ByVal setViaAutoOpen As Boolean, ByVal pathFileName As String)
 		Dim extension As String = ""
 
-		extension = Path.GetExtension(pathFileName)
-		If extension = ".vpk" Then
+		extension = Path.GetExtension(pathFileName).ToLower()
+		If extension = ".url" Then
+			Dim fileLines() As String
+			fileLines = File.ReadAllLines(pathFileName)
+			If fileLines(0) = "[InternetShortcut]" Then
+				For Each line As String In fileLines
+					If line.StartsWith("URL=") Then
+						Dim urlText As String
+						urlText = line.Replace("URL=", "")
+						Me.MainTabControl.SelectTab(Me.DownloadTabPage)
+						Me.DownloadUserControl1.ItemIdTextBox.Text = urlText
+						Exit For
+					End If
+				Next
+			End If
+		ElseIf extension = ".vpk" Then
 			Dim vpkAction As ActionType = ActionType.Unknown
 			If setViaAutoOpen Then
 				If TheApp.Settings.OptionsAutoOpenVpkFileIsChecked Then
-					vpkAction = ActionType.Unpack
+					vpkAction = TheApp.Settings.OptionsAutoOpenVpkFileOption
 				End If
 			Else
-				vpkAction = ActionType.Unpack
+				If Me.MainTabControl.SelectedTab Is Me.UnpackTabPage Then
+					vpkAction = ActionType.Unpack
+				ElseIf Me.MainTabControl.SelectedTab Is Me.PublishTabPage Then
+					vpkAction = ActionType.Publish
+				Else
+					vpkAction = TheApp.Settings.OptionsDragAndDropVpkFileOption
+				End If
 			End If
 			If vpkAction = ActionType.Unpack Then
 				TheApp.Settings.UnpackPackagePathFolderOrFileName = pathFileName
 				Me.MainTabControl.SelectTab(Me.UnpackTabPage)
+				Me.UnpackUserControl1.RunUnpackerToGetListOfPackageContents()
+			ElseIf vpkAction = ActionType.Publish Then
+				Me.MainTabControl.SelectTab(Me.PublishTabPage)
+				Me.PublishUserControl1.ItemContentPathFileNameTextBox.Text = pathFileName
+				Me.PublishUserControl1.ItemContentPathFileNameTextBox.DataBindings("Text").WriteValue()
 			End If
 		ElseIf extension = ".gma" Then
 			Dim vpkAction As ActionType = ActionType.Unknown
 			If setViaAutoOpen Then
 				If TheApp.Settings.OptionsAutoOpenGmaFileIsChecked Then
-					vpkAction = ActionType.Unpack
+					vpkAction = TheApp.Settings.OptionsAutoOpenGmaFileOption
 				End If
 			Else
-				vpkAction = ActionType.Unpack
+				If Me.MainTabControl.SelectedTab Is Me.UnpackTabPage Then
+					vpkAction = ActionType.Unpack
+				ElseIf Me.MainTabControl.SelectedTab Is Me.PublishTabPage Then
+					vpkAction = ActionType.Publish
+				Else
+					vpkAction = TheApp.Settings.OptionsDragAndDropGmaFileOption
+				End If
 			End If
 			If vpkAction = ActionType.Unpack Then
 				TheApp.Settings.UnpackPackagePathFolderOrFileName = pathFileName
 				Me.MainTabControl.SelectTab(Me.UnpackTabPage)
+				Me.UnpackUserControl1.RunUnpackerToGetListOfPackageContents()
+			ElseIf vpkAction = ActionType.Publish Then
+				Me.MainTabControl.SelectTab(Me.PublishTabPage)
+				Me.PublishUserControl1.ItemContentPathFileNameTextBox.Text = pathFileName
+				Me.PublishUserControl1.ItemContentPathFileNameTextBox.DataBindings("Text").WriteValue()
 			End If
 		ElseIf extension = ".fpx" Then
 			Dim vpkAction As ActionType = ActionType.Unknown
@@ -290,6 +378,7 @@ Public Class MainForm
 			If vpkAction = ActionType.Unpack Then
 				TheApp.Settings.UnpackPackagePathFolderOrFileName = pathFileName
 				Me.MainTabControl.SelectTab(Me.UnpackTabPage)
+				Me.UnpackUserControl1.RunUnpackerToGetListOfPackageContents()
 			End If
 		ElseIf extension = ".mdl" Then
 			Me.SetMdlDrop(setViaAutoOpen, pathFileName)
@@ -308,9 +397,18 @@ Public Class MainForm
 				TheApp.Settings.CompileQcPathFileName = pathFileName
 				Me.MainTabControl.SelectTab(Me.CompileTabPage)
 			End If
+		ElseIf extension = ".bmp" OrElse extension = ".gif" OrElse extension = ".jpeg" OrElse extension = ".jpg" OrElse extension = ".png" OrElse extension = ".wmf" Then
+			Me.MainTabControl.SelectTab(Me.PublishTabPage)
+			Me.PublishUserControl1.ItemPreviewImagePathFileNameTextBox.Text = pathFileName
+			Me.PublishUserControl1.ItemPreviewImagePathFileNameTextBox.DataBindings("Text").WriteValue()
 		Else
 			Me.SetFolderDrop(setViaAutoOpen, pathFileName)
 		End If
+	End Sub
+
+	Private Sub SetDroppedUrlText(ByVal setViaAutoOpen As Boolean, ByVal urlText As String)
+		Me.MainTabControl.SelectTab(Me.DownloadTabPage)
+		Me.DownloadUserControl1.ItemIdTextBox.Text = urlText
 	End Sub
 
 	Private Sub SetMdlDrop(ByVal setViaAutoOpen As Boolean, ByVal pathFileName As String)
@@ -386,21 +484,35 @@ Public Class MainForm
 			Else
 				folderAction = TheApp.Settings.OptionsDragAndDropFolderOption
 				selectedTab = Me.MainTabControl.SelectedTab
-				If selectedTab Is Me.UnpackTabPage Then
+				If selectedTab Is Me.PublishTabPage Then
+					folderAction = ActionType.Publish
+				ElseIf selectedTab Is Me.UnpackTabPage Then
 					folderAction = ActionType.Unpack
 				ElseIf selectedTab Is Me.DecompileTabPage Then
 					folderAction = ActionType.Decompile
 				ElseIf selectedTab Is Me.CompileTabPage Then
 					folderAction = ActionType.Compile
+				ElseIf selectedTab Is Me.packTabPage Then
+					folderAction = ActionType.Pack
 				Else
 					selectedTab = Nothing
 				End If
 			End If
 
 			If selectedTab Is Nothing AndAlso Directory.Exists(pathFileName) Then
-				If Directory.GetFiles(pathFileName, "*.vpk").Length > 0 Then
-					folderAction = ActionType.Unpack
-				Else
+				Dim packageExtensions As List(Of String) = BasePackageFile.GetListOfPackageExtensions()
+				For Each packageExtension As String In packageExtensions
+					For Each anArchivePathFileName As String In Directory.GetFiles(pathFileName, packageExtension)
+						If anArchivePathFileName.Length > 0 Then
+							folderAction = ActionType.Unpack
+							Exit For
+						End If
+					Next
+					If folderAction = ActionType.Unpack Then
+						Exit For
+					End If
+				Next
+				If folderAction <> ActionType.Unpack Then
 					If Directory.GetFiles(pathFileName, "*.mdl").Length > 0 Then
 						folderAction = ActionType.Decompile
 					Else
@@ -423,6 +535,13 @@ Public Class MainForm
 		ElseIf folderAction = ActionType.Compile Then
 			TheApp.Settings.CompileQcPathFileName = pathFileName
 			Me.MainTabControl.SelectTab(Me.CompileTabPage)
+		ElseIf folderAction = ActionType.Pack Then
+			TheApp.Settings.PackInputPath = pathFileName
+			Me.MainTabControl.SelectTab(Me.PackTabPage)
+		ElseIf folderAction = ActionType.Publish Then
+			Me.PublishUserControl1.ItemContentPathFileNameTextBox.Text = pathFileName
+			Me.PublishUserControl1.ItemContentPathFileNameTextBox.DataBindings("Text").WriteValue()
+			Me.MainTabControl.SelectTab(Me.PublishTabPage)
 		End If
 	End Sub
 

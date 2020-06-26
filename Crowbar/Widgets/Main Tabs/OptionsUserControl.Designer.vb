@@ -36,12 +36,15 @@ Partial Class OptionsUserControl
 		Me.AutoOpenMdlFileCheckBox = New System.Windows.Forms.CheckBox()
 		Me.AutoOpenQcFileCheckBox = New System.Windows.Forms.CheckBox()
 		Me.GroupBox2 = New System.Windows.Forms.GroupBox()
+		Me.Label14 = New System.Windows.Forms.Label()
+		Me.AutoOpenFpxFileCheckBox = New System.Windows.Forms.CheckBox()
+		Me.AutoOpenGmaFileCheckBox = New System.Windows.Forms.CheckBox()
 		Me.Label5 = New System.Windows.Forms.Label()
-		Me.Panel2 = New System.Windows.Forms.Panel()
+		Me.AutoOpenFolderPanel = New System.Windows.Forms.Panel()
+		Me.AutoOpenFolderForPackRadioButton = New System.Windows.Forms.RadioButton()
 		Me.AutoOpenFolderForCompileRadioButton = New System.Windows.Forms.RadioButton()
 		Me.AutoOpenFolderForDecompileRadioButton = New System.Windows.Forms.RadioButton()
 		Me.AutoOpenFolderForUnpackRadioButton = New System.Windows.Forms.RadioButton()
-		Me.Label6 = New System.Windows.Forms.Label()
 		Me.Label4 = New System.Windows.Forms.Label()
 		Me.Label2 = New System.Windows.Forms.Label()
 		Me.AutoOpenUseDefaultsButton = New System.Windows.Forms.Button()
@@ -70,6 +73,7 @@ Partial Class OptionsUserControl
 		Me.Label3 = New System.Windows.Forms.Label()
 		Me.DragAndDropUseDefaultsButton = New System.Windows.Forms.Button()
 		Me.Panel4 = New System.Windows.Forms.Panel()
+		Me.DragAndDropFolderForPackRadioButton = New System.Windows.Forms.RadioButton()
 		Me.DragAndDropFolderForCompileRadioButton = New System.Windows.Forms.RadioButton()
 		Me.DragAndDropFolderForDecompileRadioButton = New System.Windows.Forms.RadioButton()
 		Me.DragAndDropFolderForUnpackRadioButton = New System.Windows.Forms.RadioButton()
@@ -77,19 +81,33 @@ Partial Class OptionsUserControl
 		Me.ApplyButton = New System.Windows.Forms.Button()
 		Me.ApplyPanel = New System.Windows.Forms.Panel()
 		Me.SingleInstanceCheckBox = New System.Windows.Forms.CheckBox()
+		Me.AutoOpenVpkPanel = New System.Windows.Forms.Panel()
+		Me.AutoOpenVpkFileForPublishRadioButton = New System.Windows.Forms.RadioButton()
+		Me.AutoOpenVpkFileForUnpackRadioButton = New System.Windows.Forms.RadioButton()
+		Me.Panel2 = New System.Windows.Forms.Panel()
+		Me.AutoOpenGmaFileForPublishRadioButton = New System.Windows.Forms.RadioButton()
+		Me.AutoOpenGmaFileForUnpackRadioButton = New System.Windows.Forms.RadioButton()
+		Me.Label6 = New System.Windows.Forms.Label()
 		Me.Label7 = New System.Windows.Forms.Label()
-		Me.AutoOpenGmaFileCheckBox = New System.Windows.Forms.CheckBox()
-		Me.Label14 = New System.Windows.Forms.Label()
-		Me.AutoOpenFpxFileCheckBox = New System.Windows.Forms.CheckBox()
+		Me.Panel5 = New System.Windows.Forms.Panel()
+		Me.DragAndDropGmaFileForPublishRadioButton = New System.Windows.Forms.RadioButton()
+		Me.DragAndDropGmaFileForUnpackRadioButton = New System.Windows.Forms.RadioButton()
+		Me.Panel6 = New System.Windows.Forms.Panel()
+		Me.DragAndDropVpkFileForPublishRadioButton = New System.Windows.Forms.RadioButton()
+		Me.DragAndDropVpkFileForUnpackRadioButton = New System.Windows.Forms.RadioButton()
 		Me.GroupBox1.SuspendLayout()
 		Me.Panel7.SuspendLayout()
 		Me.GroupBox2.SuspendLayout()
-		Me.Panel2.SuspendLayout()
+		Me.AutoOpenFolderPanel.SuspendLayout()
 		Me.Panel1.SuspendLayout()
 		Me.GroupBox3.SuspendLayout()
 		Me.Panel3.SuspendLayout()
 		Me.Panel4.SuspendLayout()
 		Me.ApplyPanel.SuspendLayout()
+		Me.AutoOpenVpkPanel.SuspendLayout()
+		Me.Panel2.SuspendLayout()
+		Me.Panel5.SuspendLayout()
+		Me.Panel6.SuspendLayout()
 		Me.SuspendLayout()
 		'
 		'IntegrateContextMenuItemsCheckBox
@@ -130,7 +148,7 @@ Partial Class OptionsUserControl
 		Me.GroupBox1.Controls.Add(Me.IntegrateAsSubmenuCheckBox)
 		Me.GroupBox1.Location = New System.Drawing.Point(415, 26)
 		Me.GroupBox1.Name = "GroupBox1"
-		Me.GroupBox1.Size = New System.Drawing.Size(309, 445)
+		Me.GroupBox1.Size = New System.Drawing.Size(309, 467)
 		Me.GroupBox1.TabIndex = 2
 		Me.GroupBox1.TabStop = False
 		Me.GroupBox1.Text = "Windows Explorer Context Menu"
@@ -236,7 +254,7 @@ Partial Class OptionsUserControl
 		'ContextMenuUseDefaultsButton
 		'
 		Me.ContextMenuUseDefaultsButton.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-		Me.ContextMenuUseDefaultsButton.Location = New System.Drawing.Point(104, 397)
+		Me.ContextMenuUseDefaultsButton.Location = New System.Drawing.Point(104, 438)
 		Me.ContextMenuUseDefaultsButton.Name = "ContextMenuUseDefaultsButton"
 		Me.ContextMenuUseDefaultsButton.Size = New System.Drawing.Size(100, 23)
 		Me.ContextMenuUseDefaultsButton.TabIndex = 19
@@ -246,7 +264,7 @@ Partial Class OptionsUserControl
 		'AutoOpenMdlFileCheckBox
 		'
 		Me.AutoOpenMdlFileCheckBox.AutoSize = True
-		Me.AutoOpenMdlFileCheckBox.Location = New System.Drawing.Point(6, 177)
+		Me.AutoOpenMdlFileCheckBox.Location = New System.Drawing.Point(6, 214)
 		Me.AutoOpenMdlFileCheckBox.Name = "AutoOpenMdlFileCheckBox"
 		Me.AutoOpenMdlFileCheckBox.Size = New System.Drawing.Size(67, 17)
 		Me.AutoOpenMdlFileCheckBox.TabIndex = 2
@@ -256,7 +274,7 @@ Partial Class OptionsUserControl
 		'AutoOpenQcFileCheckBox
 		'
 		Me.AutoOpenQcFileCheckBox.AutoSize = True
-		Me.AutoOpenQcFileCheckBox.Location = New System.Drawing.Point(6, 276)
+		Me.AutoOpenQcFileCheckBox.Location = New System.Drawing.Point(6, 307)
 		Me.AutoOpenQcFileCheckBox.Name = "AutoOpenQcFileCheckBox"
 		Me.AutoOpenQcFileCheckBox.Size = New System.Drawing.Size(62, 17)
 		Me.AutoOpenQcFileCheckBox.TabIndex = 4
@@ -265,13 +283,13 @@ Partial Class OptionsUserControl
 		'
 		'GroupBox2
 		'
+		Me.GroupBox2.Controls.Add(Me.Panel2)
+		Me.GroupBox2.Controls.Add(Me.AutoOpenVpkPanel)
 		Me.GroupBox2.Controls.Add(Me.Label14)
 		Me.GroupBox2.Controls.Add(Me.AutoOpenFpxFileCheckBox)
-		Me.GroupBox2.Controls.Add(Me.Label7)
 		Me.GroupBox2.Controls.Add(Me.AutoOpenGmaFileCheckBox)
 		Me.GroupBox2.Controls.Add(Me.Label5)
-		Me.GroupBox2.Controls.Add(Me.Panel2)
-		Me.GroupBox2.Controls.Add(Me.Label6)
+		Me.GroupBox2.Controls.Add(Me.AutoOpenFolderPanel)
 		Me.GroupBox2.Controls.Add(Me.Label4)
 		Me.GroupBox2.Controls.Add(Me.Label2)
 		Me.GroupBox2.Controls.Add(Me.AutoOpenUseDefaultsButton)
@@ -281,37 +299,80 @@ Partial Class OptionsUserControl
 		Me.GroupBox2.Controls.Add(Me.AutoOpenVpkFileCheckBox)
 		Me.GroupBox2.Location = New System.Drawing.Point(3, 26)
 		Me.GroupBox2.Name = "GroupBox2"
-		Me.GroupBox2.Size = New System.Drawing.Size(200, 445)
+		Me.GroupBox2.Size = New System.Drawing.Size(200, 467)
 		Me.GroupBox2.TabIndex = 0
 		Me.GroupBox2.TabStop = False
 		Me.GroupBox2.Text = "Windows Explorer Auto-Open"
 		'
+		'Label14
+		'
+		Me.Label14.BackColor = System.Drawing.SystemColors.Control
+		Me.Label14.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+		Me.Label14.Location = New System.Drawing.Point(81, 192)
+		Me.Label14.Margin = New System.Windows.Forms.Padding(3)
+		Me.Label14.Name = "Label14"
+		Me.Label14.Size = New System.Drawing.Size(89, 17)
+		Me.Label14.TabIndex = 18
+		Me.Label14.Text = "Unpack"
+		'
+		'AutoOpenFpxFileCheckBox
+		'
+		Me.AutoOpenFpxFileCheckBox.AutoSize = True
+		Me.AutoOpenFpxFileCheckBox.Location = New System.Drawing.Point(6, 191)
+		Me.AutoOpenFpxFileCheckBox.Name = "AutoOpenFpxFileCheckBox"
+		Me.AutoOpenFpxFileCheckBox.Size = New System.Drawing.Size(65, 17)
+		Me.AutoOpenFpxFileCheckBox.TabIndex = 17
+		Me.AutoOpenFpxFileCheckBox.Text = "FPX file:"
+		Me.AutoOpenFpxFileCheckBox.UseVisualStyleBackColor = True
+		'
+		'AutoOpenGmaFileCheckBox
+		'
+		Me.AutoOpenGmaFileCheckBox.AutoSize = True
+		Me.AutoOpenGmaFileCheckBox.Location = New System.Drawing.Point(6, 151)
+		Me.AutoOpenGmaFileCheckBox.Name = "AutoOpenGmaFileCheckBox"
+		Me.AutoOpenGmaFileCheckBox.Size = New System.Drawing.Size(69, 17)
+		Me.AutoOpenGmaFileCheckBox.TabIndex = 15
+		Me.AutoOpenGmaFileCheckBox.Text = "GMA file:"
+		Me.AutoOpenGmaFileCheckBox.UseVisualStyleBackColor = True
+		'
 		'Label5
 		'
 		Me.Label5.AutoSize = True
-		Me.Label5.Location = New System.Drawing.Point(6, 299)
+		Me.Label5.Location = New System.Drawing.Point(6, 330)
 		Me.Label5.Margin = New System.Windows.Forms.Padding(3)
 		Me.Label5.Name = "Label5"
 		Me.Label5.Size = New System.Drawing.Size(41, 13)
 		Me.Label5.TabIndex = 6
 		Me.Label5.Text = "Folder:"
 		'
-		'Panel2
+		'AutoOpenFolderPanel
 		'
-		Me.Panel2.BackColor = System.Drawing.SystemColors.Control
-		Me.Panel2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-		Me.Panel2.Controls.Add(Me.AutoOpenFolderForCompileRadioButton)
-		Me.Panel2.Controls.Add(Me.AutoOpenFolderForDecompileRadioButton)
-		Me.Panel2.Controls.Add(Me.AutoOpenFolderForUnpackRadioButton)
-		Me.Panel2.Location = New System.Drawing.Point(25, 318)
-		Me.Panel2.Name = "Panel2"
-		Me.Panel2.Size = New System.Drawing.Size(141, 56)
-		Me.Panel2.TabIndex = 7
+		Me.AutoOpenFolderPanel.BackColor = System.Drawing.SystemColors.Control
+		Me.AutoOpenFolderPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+		Me.AutoOpenFolderPanel.Controls.Add(Me.AutoOpenFolderForPackRadioButton)
+		Me.AutoOpenFolderPanel.Controls.Add(Me.AutoOpenFolderForCompileRadioButton)
+		Me.AutoOpenFolderPanel.Controls.Add(Me.AutoOpenFolderForDecompileRadioButton)
+		Me.AutoOpenFolderPanel.Controls.Add(Me.AutoOpenFolderForUnpackRadioButton)
+		Me.AutoOpenFolderPanel.Location = New System.Drawing.Point(81, 330)
+		Me.AutoOpenFolderPanel.Name = "AutoOpenFolderPanel"
+		Me.AutoOpenFolderPanel.Size = New System.Drawing.Size(89, 66)
+		Me.AutoOpenFolderPanel.TabIndex = 7
+		'
+		'AutoOpenFolderForPackRadioButton
+		'
+		Me.AutoOpenFolderForPackRadioButton.AutoSize = True
+		Me.AutoOpenFolderForPackRadioButton.Location = New System.Drawing.Point(3, 45)
+		Me.AutoOpenFolderForPackRadioButton.Name = "AutoOpenFolderForPackRadioButton"
+		Me.AutoOpenFolderForPackRadioButton.Size = New System.Drawing.Size(47, 17)
+		Me.AutoOpenFolderForPackRadioButton.TabIndex = 15
+		Me.AutoOpenFolderForPackRadioButton.TabStop = True
+		Me.AutoOpenFolderForPackRadioButton.Text = "Pack"
+		Me.AutoOpenFolderForPackRadioButton.UseVisualStyleBackColor = True
 		'
 		'AutoOpenFolderForCompileRadioButton
 		'
 		Me.AutoOpenFolderForCompileRadioButton.AutoSize = True
-		Me.AutoOpenFolderForCompileRadioButton.Location = New System.Drawing.Point(3, 33)
+		Me.AutoOpenFolderForCompileRadioButton.Location = New System.Drawing.Point(3, 30)
 		Me.AutoOpenFolderForCompileRadioButton.Name = "AutoOpenFolderForCompileRadioButton"
 		Me.AutoOpenFolderForCompileRadioButton.Size = New System.Drawing.Size(62, 17)
 		Me.AutoOpenFolderForCompileRadioButton.TabIndex = 14
@@ -322,7 +383,7 @@ Partial Class OptionsUserControl
 		'AutoOpenFolderForDecompileRadioButton
 		'
 		Me.AutoOpenFolderForDecompileRadioButton.AutoSize = True
-		Me.AutoOpenFolderForDecompileRadioButton.Location = New System.Drawing.Point(3, 18)
+		Me.AutoOpenFolderForDecompileRadioButton.Location = New System.Drawing.Point(3, 15)
 		Me.AutoOpenFolderForDecompileRadioButton.Name = "AutoOpenFolderForDecompileRadioButton"
 		Me.AutoOpenFolderForDecompileRadioButton.Size = New System.Drawing.Size(73, 17)
 		Me.AutoOpenFolderForDecompileRadioButton.TabIndex = 13
@@ -333,7 +394,7 @@ Partial Class OptionsUserControl
 		'AutoOpenFolderForUnpackRadioButton
 		'
 		Me.AutoOpenFolderForUnpackRadioButton.AutoSize = True
-		Me.AutoOpenFolderForUnpackRadioButton.Location = New System.Drawing.Point(3, 3)
+		Me.AutoOpenFolderForUnpackRadioButton.Location = New System.Drawing.Point(3, 0)
 		Me.AutoOpenFolderForUnpackRadioButton.Name = "AutoOpenFolderForUnpackRadioButton"
 		Me.AutoOpenFolderForUnpackRadioButton.Size = New System.Drawing.Size(60, 17)
 		Me.AutoOpenFolderForUnpackRadioButton.TabIndex = 12
@@ -341,22 +402,11 @@ Partial Class OptionsUserControl
 		Me.AutoOpenFolderForUnpackRadioButton.Text = "Unpack"
 		Me.AutoOpenFolderForUnpackRadioButton.UseVisualStyleBackColor = True
 		'
-		'Label6
-		'
-		Me.Label6.BackColor = System.Drawing.SystemColors.Control
-		Me.Label6.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-		Me.Label6.Location = New System.Drawing.Point(77, 109)
-		Me.Label6.Margin = New System.Windows.Forms.Padding(3)
-		Me.Label6.Name = "Label6"
-		Me.Label6.Size = New System.Drawing.Size(89, 17)
-		Me.Label6.TabIndex = 1
-		Me.Label6.Text = "Unpack"
-		'
 		'Label4
 		'
 		Me.Label4.BackColor = System.Drawing.SystemColors.Control
 		Me.Label4.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-		Me.Label4.Location = New System.Drawing.Point(77, 276)
+		Me.Label4.Location = New System.Drawing.Point(81, 307)
 		Me.Label4.Margin = New System.Windows.Forms.Padding(3)
 		Me.Label4.Name = "Label4"
 		Me.Label4.Size = New System.Drawing.Size(89, 17)
@@ -371,14 +421,14 @@ Partial Class OptionsUserControl
 		Me.Label2.Name = "Label2"
 		Me.Label2.Size = New System.Drawing.Size(188, 83)
 		Me.Label2.TabIndex = 14
-		Me.Label2.Text = "Change the default program to Crowbar for the following file extensions and which" & _
-	" tab to set up. This includes when files or folders are dragged onto the ""Crowba" & _
+		Me.Label2.Text = "Change the default program to Crowbar for the following file extensions and which" &
+	" tab to set up. This includes when files or folders are dragged onto the ""Crowba" &
 	"r.exe"" file."
 		'
 		'AutoOpenUseDefaultsButton
 		'
 		Me.AutoOpenUseDefaultsButton.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-		Me.AutoOpenUseDefaultsButton.Location = New System.Drawing.Point(42, 398)
+		Me.AutoOpenUseDefaultsButton.Location = New System.Drawing.Point(44, 438)
 		Me.AutoOpenUseDefaultsButton.Name = "AutoOpenUseDefaultsButton"
 		Me.AutoOpenUseDefaultsButton.Size = New System.Drawing.Size(100, 23)
 		Me.AutoOpenUseDefaultsButton.TabIndex = 8
@@ -397,9 +447,9 @@ Partial Class OptionsUserControl
 		Me.Panel1.Controls.Add(Me.AutoOpenMdlFileForViewingRadioButton)
 		Me.Panel1.Controls.Add(Me.AutoOpenMdlFileForPreviewingRadioButton)
 		Me.Panel1.Controls.Add(Me.AutoOpenMdlFileForDecompilingRadioButton)
-		Me.Panel1.Location = New System.Drawing.Point(25, 200)
+		Me.Panel1.Location = New System.Drawing.Point(25, 231)
 		Me.Panel1.Name = "Panel1"
-		Me.Panel1.Size = New System.Drawing.Size(141, 70)
+		Me.Panel1.Size = New System.Drawing.Size(145, 70)
 		Me.Panel1.TabIndex = 3
 		'
 		'Label9
@@ -489,6 +539,10 @@ Partial Class OptionsUserControl
 		'
 		'GroupBox3
 		'
+		Me.GroupBox3.Controls.Add(Me.Panel5)
+		Me.GroupBox3.Controls.Add(Me.Panel6)
+		Me.GroupBox3.Controls.Add(Me.Label7)
+		Me.GroupBox3.Controls.Add(Me.Label6)
 		Me.GroupBox3.Controls.Add(Me.Label13)
 		Me.GroupBox3.Controls.Add(Me.Label12)
 		Me.GroupBox3.Controls.Add(Me.Panel3)
@@ -497,7 +551,7 @@ Partial Class OptionsUserControl
 		Me.GroupBox3.Controls.Add(Me.Panel4)
 		Me.GroupBox3.Location = New System.Drawing.Point(209, 26)
 		Me.GroupBox3.Name = "GroupBox3"
-		Me.GroupBox3.Size = New System.Drawing.Size(200, 445)
+		Me.GroupBox3.Size = New System.Drawing.Size(200, 467)
 		Me.GroupBox3.TabIndex = 1
 		Me.GroupBox3.TabStop = False
 		Me.GroupBox3.Text = "Windows Explorer Drag-and-Drop"
@@ -505,7 +559,7 @@ Partial Class OptionsUserControl
 		'Label13
 		'
 		Me.Label13.AutoSize = True
-		Me.Label13.Location = New System.Drawing.Point(6, 204)
+		Me.Label13.Location = New System.Drawing.Point(6, 287)
 		Me.Label13.Margin = New System.Windows.Forms.Padding(3)
 		Me.Label13.Name = "Label13"
 		Me.Label13.Size = New System.Drawing.Size(41, 13)
@@ -515,7 +569,7 @@ Partial Class OptionsUserControl
 		'Label12
 		'
 		Me.Label12.AutoSize = True
-		Me.Label12.Location = New System.Drawing.Point(6, 109)
+		Me.Label12.Location = New System.Drawing.Point(6, 192)
 		Me.Label12.Margin = New System.Windows.Forms.Padding(3)
 		Me.Label12.Name = "Label12"
 		Me.Label12.Size = New System.Drawing.Size(48, 13)
@@ -534,9 +588,9 @@ Partial Class OptionsUserControl
 		Me.Panel3.Controls.Add(Me.DragAndDropMdlFileForPreviewingRadioButton)
 		Me.Panel3.Controls.Add(Me.DragAndDropMdlFileForDecompilingRadioButton)
 		Me.Panel3.Controls.Add(Me.DragAndDropMdlFileForViewingRadioButton)
-		Me.Panel3.Location = New System.Drawing.Point(25, 128)
+		Me.Panel3.Location = New System.Drawing.Point(25, 207)
 		Me.Panel3.Name = "Panel3"
-		Me.Panel3.Size = New System.Drawing.Size(141, 70)
+		Me.Panel3.Size = New System.Drawing.Size(145, 70)
 		Me.Panel3.TabIndex = 1
 		'
 		'Label10
@@ -622,14 +676,14 @@ Partial Class OptionsUserControl
 		Me.Label3.Name = "Label3"
 		Me.Label3.Size = New System.Drawing.Size(188, 83)
 		Me.Label3.TabIndex = 19
-		Me.Label3.Text = "Choose which tabs Crowbar sets up and which tab opens when a file or folder is dr" & _
-	"opped on Crowbar. Dropping on any tab left unset below will only set up that tab" & _
+		Me.Label3.Text = "Choose which tabs Crowbar sets up and which tab opens when a file or folder is dr" &
+	"opped on Crowbar. Dropping on any tab left unset below will only set up that tab" &
 	"."
 		'
 		'DragAndDropUseDefaultsButton
 		'
 		Me.DragAndDropUseDefaultsButton.Anchor = CType((System.Windows.Forms.AnchorStyles.Bottom Or System.Windows.Forms.AnchorStyles.Left), System.Windows.Forms.AnchorStyles)
-		Me.DragAndDropUseDefaultsButton.Location = New System.Drawing.Point(42, 397)
+		Me.DragAndDropUseDefaultsButton.Location = New System.Drawing.Point(50, 438)
 		Me.DragAndDropUseDefaultsButton.Name = "DragAndDropUseDefaultsButton"
 		Me.DragAndDropUseDefaultsButton.Size = New System.Drawing.Size(100, 23)
 		Me.DragAndDropUseDefaultsButton.TabIndex = 4
@@ -640,18 +694,30 @@ Partial Class OptionsUserControl
 		'
 		Me.Panel4.BackColor = System.Drawing.SystemColors.Control
 		Me.Panel4.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+		Me.Panel4.Controls.Add(Me.DragAndDropFolderForPackRadioButton)
 		Me.Panel4.Controls.Add(Me.DragAndDropFolderForCompileRadioButton)
 		Me.Panel4.Controls.Add(Me.DragAndDropFolderForDecompileRadioButton)
 		Me.Panel4.Controls.Add(Me.DragAndDropFolderForUnpackRadioButton)
-		Me.Panel4.Location = New System.Drawing.Point(25, 223)
+		Me.Panel4.Location = New System.Drawing.Point(81, 283)
 		Me.Panel4.Name = "Panel4"
-		Me.Panel4.Size = New System.Drawing.Size(141, 56)
+		Me.Panel4.Size = New System.Drawing.Size(89, 66)
 		Me.Panel4.TabIndex = 3
+		'
+		'DragAndDropFolderForPackRadioButton
+		'
+		Me.DragAndDropFolderForPackRadioButton.AutoSize = True
+		Me.DragAndDropFolderForPackRadioButton.Location = New System.Drawing.Point(3, 45)
+		Me.DragAndDropFolderForPackRadioButton.Name = "DragAndDropFolderForPackRadioButton"
+		Me.DragAndDropFolderForPackRadioButton.Size = New System.Drawing.Size(47, 17)
+		Me.DragAndDropFolderForPackRadioButton.TabIndex = 3
+		Me.DragAndDropFolderForPackRadioButton.TabStop = True
+		Me.DragAndDropFolderForPackRadioButton.Text = "Pack"
+		Me.DragAndDropFolderForPackRadioButton.UseVisualStyleBackColor = True
 		'
 		'DragAndDropFolderForCompileRadioButton
 		'
 		Me.DragAndDropFolderForCompileRadioButton.AutoSize = True
-		Me.DragAndDropFolderForCompileRadioButton.Location = New System.Drawing.Point(3, 33)
+		Me.DragAndDropFolderForCompileRadioButton.Location = New System.Drawing.Point(3, 30)
 		Me.DragAndDropFolderForCompileRadioButton.Name = "DragAndDropFolderForCompileRadioButton"
 		Me.DragAndDropFolderForCompileRadioButton.Size = New System.Drawing.Size(62, 17)
 		Me.DragAndDropFolderForCompileRadioButton.TabIndex = 2
@@ -662,7 +728,7 @@ Partial Class OptionsUserControl
 		'DragAndDropFolderForDecompileRadioButton
 		'
 		Me.DragAndDropFolderForDecompileRadioButton.AutoSize = True
-		Me.DragAndDropFolderForDecompileRadioButton.Location = New System.Drawing.Point(3, 18)
+		Me.DragAndDropFolderForDecompileRadioButton.Location = New System.Drawing.Point(3, 15)
 		Me.DragAndDropFolderForDecompileRadioButton.Name = "DragAndDropFolderForDecompileRadioButton"
 		Me.DragAndDropFolderForDecompileRadioButton.Size = New System.Drawing.Size(73, 17)
 		Me.DragAndDropFolderForDecompileRadioButton.TabIndex = 1
@@ -673,7 +739,7 @@ Partial Class OptionsUserControl
 		'DragAndDropFolderForUnpackRadioButton
 		'
 		Me.DragAndDropFolderForUnpackRadioButton.AutoSize = True
-		Me.DragAndDropFolderForUnpackRadioButton.Location = New System.Drawing.Point(3, 3)
+		Me.DragAndDropFolderForUnpackRadioButton.Location = New System.Drawing.Point(3, 0)
 		Me.DragAndDropFolderForUnpackRadioButton.Name = "DragAndDropFolderForUnpackRadioButton"
 		Me.DragAndDropFolderForUnpackRadioButton.Size = New System.Drawing.Size(60, 17)
 		Me.DragAndDropFolderForUnpackRadioButton.TabIndex = 0
@@ -688,7 +754,7 @@ Partial Class OptionsUserControl
 		Me.ApplyLabel.Name = "ApplyLabel"
 		Me.ApplyLabel.Size = New System.Drawing.Size(470, 13)
 		Me.ApplyLabel.TabIndex = 18
-		Me.ApplyLabel.Text = "Windows is not using what is specified above. Click the Apply button to apply the" & _
+		Me.ApplyLabel.Text = "Windows is not using what is specified above. Click the Apply button to apply the" &
 	" options above."
 		'
 		'ApplyButton
@@ -705,7 +771,7 @@ Partial Class OptionsUserControl
 		Me.ApplyPanel.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D
 		Me.ApplyPanel.Controls.Add(Me.ApplyLabel)
 		Me.ApplyPanel.Controls.Add(Me.ApplyButton)
-		Me.ApplyPanel.Location = New System.Drawing.Point(3, 477)
+		Me.ApplyPanel.Location = New System.Drawing.Point(3, 499)
 		Me.ApplyPanel.Name = "ApplyPanel"
 		Me.ApplyPanel.Size = New System.Drawing.Size(585, 34)
 		Me.ApplyPanel.TabIndex = 3
@@ -721,47 +787,157 @@ Partial Class OptionsUserControl
 		Me.SingleInstanceCheckBox.Text = "Restrict to single instance (only one Crowbar open at a time)"
 		Me.SingleInstanceCheckBox.UseVisualStyleBackColor = True
 		'
+		'AutoOpenVpkPanel
+		'
+		Me.AutoOpenVpkPanel.BackColor = System.Drawing.SystemColors.Control
+		Me.AutoOpenVpkPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+		Me.AutoOpenVpkPanel.Controls.Add(Me.AutoOpenVpkFileForPublishRadioButton)
+		Me.AutoOpenVpkPanel.Controls.Add(Me.AutoOpenVpkFileForUnpackRadioButton)
+		Me.AutoOpenVpkPanel.Location = New System.Drawing.Point(81, 107)
+		Me.AutoOpenVpkPanel.Name = "AutoOpenVpkPanel"
+		Me.AutoOpenVpkPanel.Size = New System.Drawing.Size(89, 36)
+		Me.AutoOpenVpkPanel.TabIndex = 16
+		'
+		'AutoOpenVpkForPublishRadioButton
+		'
+		Me.AutoOpenVpkFileForPublishRadioButton.AutoSize = True
+		Me.AutoOpenVpkFileForPublishRadioButton.Location = New System.Drawing.Point(3, 15)
+		Me.AutoOpenVpkFileForPublishRadioButton.Name = "AutoOpenVpkForPublishRadioButton"
+		Me.AutoOpenVpkFileForPublishRadioButton.Size = New System.Drawing.Size(58, 17)
+		Me.AutoOpenVpkFileForPublishRadioButton.TabIndex = 13
+		Me.AutoOpenVpkFileForPublishRadioButton.TabStop = True
+		Me.AutoOpenVpkFileForPublishRadioButton.Text = "Publish"
+		Me.AutoOpenVpkFileForPublishRadioButton.UseVisualStyleBackColor = True
+		'
+		'AutoOpenVpkForUnpackRadioButton
+		'
+		Me.AutoOpenVpkFileForUnpackRadioButton.AutoSize = True
+		Me.AutoOpenVpkFileForUnpackRadioButton.Location = New System.Drawing.Point(3, 0)
+		Me.AutoOpenVpkFileForUnpackRadioButton.Name = "AutoOpenVpkForUnpackRadioButton"
+		Me.AutoOpenVpkFileForUnpackRadioButton.Size = New System.Drawing.Size(60, 17)
+		Me.AutoOpenVpkFileForUnpackRadioButton.TabIndex = 12
+		Me.AutoOpenVpkFileForUnpackRadioButton.TabStop = True
+		Me.AutoOpenVpkFileForUnpackRadioButton.Text = "Unpack"
+		Me.AutoOpenVpkFileForUnpackRadioButton.UseVisualStyleBackColor = True
+		'
+		'Panel2
+		'
+		Me.Panel2.BackColor = System.Drawing.SystemColors.Control
+		Me.Panel2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+		Me.Panel2.Controls.Add(Me.AutoOpenGmaFileForPublishRadioButton)
+		Me.Panel2.Controls.Add(Me.AutoOpenGmaFileForUnpackRadioButton)
+		Me.Panel2.Location = New System.Drawing.Point(81, 149)
+		Me.Panel2.Name = "Panel2"
+		Me.Panel2.Size = New System.Drawing.Size(89, 36)
+		Me.Panel2.TabIndex = 17
+		'
+		'AutoOpenGmaForPublishRadioButton
+		'
+		Me.AutoOpenGmaFileForPublishRadioButton.AutoSize = True
+		Me.AutoOpenGmaFileForPublishRadioButton.Location = New System.Drawing.Point(3, 15)
+		Me.AutoOpenGmaFileForPublishRadioButton.Name = "AutoOpenGmaForPublishRadioButton"
+		Me.AutoOpenGmaFileForPublishRadioButton.Size = New System.Drawing.Size(58, 17)
+		Me.AutoOpenGmaFileForPublishRadioButton.TabIndex = 13
+		Me.AutoOpenGmaFileForPublishRadioButton.TabStop = True
+		Me.AutoOpenGmaFileForPublishRadioButton.Text = "Publish"
+		Me.AutoOpenGmaFileForPublishRadioButton.UseVisualStyleBackColor = True
+		'
+		'AutoOpenGmaForUnpackRadioButton
+		'
+		Me.AutoOpenGmaFileForUnpackRadioButton.AutoSize = True
+		Me.AutoOpenGmaFileForUnpackRadioButton.Location = New System.Drawing.Point(3, 0)
+		Me.AutoOpenGmaFileForUnpackRadioButton.Name = "AutoOpenGmaForUnpackRadioButton"
+		Me.AutoOpenGmaFileForUnpackRadioButton.Size = New System.Drawing.Size(60, 17)
+		Me.AutoOpenGmaFileForUnpackRadioButton.TabIndex = 12
+		Me.AutoOpenGmaFileForUnpackRadioButton.TabStop = True
+		Me.AutoOpenGmaFileForUnpackRadioButton.Text = "Unpack"
+		Me.AutoOpenGmaFileForUnpackRadioButton.UseVisualStyleBackColor = True
+		'
+		'Label6
+		'
+		Me.Label6.AutoSize = True
+		Me.Label6.Location = New System.Drawing.Point(6, 109)
+		Me.Label6.Margin = New System.Windows.Forms.Padding(3)
+		Me.Label6.Name = "Label6"
+		Me.Label6.Size = New System.Drawing.Size(46, 13)
+		Me.Label6.TabIndex = 20
+		Me.Label6.Text = "VPK file:"
+		'
 		'Label7
 		'
-		Me.Label7.BackColor = System.Drawing.SystemColors.Control
-		Me.Label7.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-		Me.Label7.Location = New System.Drawing.Point(77, 132)
+		Me.Label7.AutoSize = True
+		Me.Label7.Location = New System.Drawing.Point(6, 152)
 		Me.Label7.Margin = New System.Windows.Forms.Padding(3)
 		Me.Label7.Name = "Label7"
-		Me.Label7.Size = New System.Drawing.Size(89, 17)
-		Me.Label7.TabIndex = 16
-		Me.Label7.Text = "Unpack"
+		Me.Label7.Size = New System.Drawing.Size(50, 13)
+		Me.Label7.TabIndex = 21
+		Me.Label7.Text = "GMA file:"
 		'
-		'AutoOpenGmaFileCheckBox
+		'Panel5
 		'
-		Me.AutoOpenGmaFileCheckBox.AutoSize = True
-		Me.AutoOpenGmaFileCheckBox.Location = New System.Drawing.Point(6, 131)
-		Me.AutoOpenGmaFileCheckBox.Name = "AutoOpenGmaFileCheckBox"
-		Me.AutoOpenGmaFileCheckBox.Size = New System.Drawing.Size(69, 17)
-		Me.AutoOpenGmaFileCheckBox.TabIndex = 15
-		Me.AutoOpenGmaFileCheckBox.Text = "GMA file:"
-		Me.AutoOpenGmaFileCheckBox.UseVisualStyleBackColor = True
+		Me.Panel5.BackColor = System.Drawing.SystemColors.Control
+		Me.Panel5.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+		Me.Panel5.Controls.Add(Me.DragAndDropGmaFileForPublishRadioButton)
+		Me.Panel5.Controls.Add(Me.DragAndDropGmaFileForUnpackRadioButton)
+		Me.Panel5.Location = New System.Drawing.Point(81, 149)
+		Me.Panel5.Name = "Panel5"
+		Me.Panel5.Size = New System.Drawing.Size(89, 36)
+		Me.Panel5.TabIndex = 23
 		'
-		'Label14
+		'DragAndDropGmaForPublishRadioButton
 		'
-		Me.Label14.BackColor = System.Drawing.SystemColors.Control
-		Me.Label14.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
-		Me.Label14.Location = New System.Drawing.Point(77, 155)
-		Me.Label14.Margin = New System.Windows.Forms.Padding(3)
-		Me.Label14.Name = "Label14"
-		Me.Label14.Size = New System.Drawing.Size(89, 17)
-		Me.Label14.TabIndex = 18
-		Me.Label14.Text = "Unpack"
+		Me.DragAndDropGmaFileForPublishRadioButton.AutoSize = True
+		Me.DragAndDropGmaFileForPublishRadioButton.Location = New System.Drawing.Point(3, 15)
+		Me.DragAndDropGmaFileForPublishRadioButton.Name = "DragAndDropGmaForPublishRadioButton"
+		Me.DragAndDropGmaFileForPublishRadioButton.Size = New System.Drawing.Size(58, 17)
+		Me.DragAndDropGmaFileForPublishRadioButton.TabIndex = 13
+		Me.DragAndDropGmaFileForPublishRadioButton.TabStop = True
+		Me.DragAndDropGmaFileForPublishRadioButton.Text = "Publish"
+		Me.DragAndDropGmaFileForPublishRadioButton.UseVisualStyleBackColor = True
 		'
-		'AutoOpenFpxFileCheckBox
+		'DragAndDropGmaForUnpackRadioButton
 		'
-		Me.AutoOpenFpxFileCheckBox.AutoSize = True
-		Me.AutoOpenFpxFileCheckBox.Location = New System.Drawing.Point(6, 154)
-		Me.AutoOpenFpxFileCheckBox.Name = "AutoOpenFpxFileCheckBox"
-		Me.AutoOpenFpxFileCheckBox.Size = New System.Drawing.Size(65, 17)
-		Me.AutoOpenFpxFileCheckBox.TabIndex = 17
-		Me.AutoOpenFpxFileCheckBox.Text = "FPX file:"
-		Me.AutoOpenFpxFileCheckBox.UseVisualStyleBackColor = True
+		Me.DragAndDropGmaFileForUnpackRadioButton.AutoSize = True
+		Me.DragAndDropGmaFileForUnpackRadioButton.Location = New System.Drawing.Point(3, 0)
+		Me.DragAndDropGmaFileForUnpackRadioButton.Name = "DragAndDropGmaForUnpackRadioButton"
+		Me.DragAndDropGmaFileForUnpackRadioButton.Size = New System.Drawing.Size(60, 17)
+		Me.DragAndDropGmaFileForUnpackRadioButton.TabIndex = 12
+		Me.DragAndDropGmaFileForUnpackRadioButton.TabStop = True
+		Me.DragAndDropGmaFileForUnpackRadioButton.Text = "Unpack"
+		Me.DragAndDropGmaFileForUnpackRadioButton.UseVisualStyleBackColor = True
+		'
+		'Panel6
+		'
+		Me.Panel6.BackColor = System.Drawing.SystemColors.Control
+		Me.Panel6.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
+		Me.Panel6.Controls.Add(Me.DragAndDropVpkFileForPublishRadioButton)
+		Me.Panel6.Controls.Add(Me.DragAndDropVpkFileForUnpackRadioButton)
+		Me.Panel6.Location = New System.Drawing.Point(81, 107)
+		Me.Panel6.Name = "Panel6"
+		Me.Panel6.Size = New System.Drawing.Size(89, 36)
+		Me.Panel6.TabIndex = 22
+		'
+		'DragAndDropVpkForPublishRadioButton
+		'
+		Me.DragAndDropVpkFileForPublishRadioButton.AutoSize = True
+		Me.DragAndDropVpkFileForPublishRadioButton.Location = New System.Drawing.Point(3, 15)
+		Me.DragAndDropVpkFileForPublishRadioButton.Name = "DragAndDropVpkForPublishRadioButton"
+		Me.DragAndDropVpkFileForPublishRadioButton.Size = New System.Drawing.Size(58, 17)
+		Me.DragAndDropVpkFileForPublishRadioButton.TabIndex = 13
+		Me.DragAndDropVpkFileForPublishRadioButton.TabStop = True
+		Me.DragAndDropVpkFileForPublishRadioButton.Text = "Publish"
+		Me.DragAndDropVpkFileForPublishRadioButton.UseVisualStyleBackColor = True
+		'
+		'DragAndDropVpkForUnpackRadioButton
+		'
+		Me.DragAndDropVpkFileForUnpackRadioButton.AutoSize = True
+		Me.DragAndDropVpkFileForUnpackRadioButton.Location = New System.Drawing.Point(3, 0)
+		Me.DragAndDropVpkFileForUnpackRadioButton.Name = "DragAndDropVpkForUnpackRadioButton"
+		Me.DragAndDropVpkFileForUnpackRadioButton.Size = New System.Drawing.Size(60, 17)
+		Me.DragAndDropVpkFileForUnpackRadioButton.TabIndex = 12
+		Me.DragAndDropVpkFileForUnpackRadioButton.TabStop = True
+		Me.DragAndDropVpkFileForUnpackRadioButton.Text = "Unpack"
+		Me.DragAndDropVpkFileForUnpackRadioButton.UseVisualStyleBackColor = True
 		'
 		'OptionsUserControl
 		'
@@ -780,8 +956,8 @@ Partial Class OptionsUserControl
 		Me.Panel7.PerformLayout()
 		Me.GroupBox2.ResumeLayout(False)
 		Me.GroupBox2.PerformLayout()
-		Me.Panel2.ResumeLayout(False)
-		Me.Panel2.PerformLayout()
+		Me.AutoOpenFolderPanel.ResumeLayout(False)
+		Me.AutoOpenFolderPanel.PerformLayout()
 		Me.Panel1.ResumeLayout(False)
 		Me.Panel1.PerformLayout()
 		Me.GroupBox3.ResumeLayout(False)
@@ -792,6 +968,14 @@ Partial Class OptionsUserControl
 		Me.Panel4.PerformLayout()
 		Me.ApplyPanel.ResumeLayout(False)
 		Me.ApplyPanel.PerformLayout()
+		Me.AutoOpenVpkPanel.ResumeLayout(False)
+		Me.AutoOpenVpkPanel.PerformLayout()
+		Me.Panel2.ResumeLayout(False)
+		Me.Panel2.PerformLayout()
+		Me.Panel5.ResumeLayout(False)
+		Me.Panel5.PerformLayout()
+		Me.Panel6.ResumeLayout(False)
+		Me.Panel6.PerformLayout()
 		Me.ResumeLayout(False)
 		Me.PerformLayout()
 
@@ -828,7 +1012,6 @@ Partial Class OptionsUserControl
 	Friend WithEvents Label2 As System.Windows.Forms.Label
 	Friend WithEvents Label3 As System.Windows.Forms.Label
 	Friend WithEvents AutoOpenMdlFileForPreviewingRadioButton As System.Windows.Forms.RadioButton
-	Friend WithEvents Label6 As System.Windows.Forms.Label
 	Friend WithEvents Label9 As System.Windows.Forms.Label
 	Friend WithEvents Label8 As System.Windows.Forms.Label
 	Friend WithEvents AutoOpenMdlFileForDecompileCheckBox As System.Windows.Forms.CheckBox
@@ -849,14 +1032,28 @@ Partial Class OptionsUserControl
 	Friend WithEvents ApplyButton As System.Windows.Forms.Button
 	Friend WithEvents ApplyPanel As System.Windows.Forms.Panel
 	Friend WithEvents Label5 As System.Windows.Forms.Label
-	Friend WithEvents Panel2 As System.Windows.Forms.Panel
+	Friend WithEvents AutoOpenFolderPanel As System.Windows.Forms.Panel
 	Friend WithEvents AutoOpenFolderForCompileRadioButton As System.Windows.Forms.RadioButton
 	Friend WithEvents AutoOpenFolderForDecompileRadioButton As System.Windows.Forms.RadioButton
 	Friend WithEvents AutoOpenFolderForUnpackRadioButton As System.Windows.Forms.RadioButton
 	Friend WithEvents SingleInstanceCheckBox As System.Windows.Forms.CheckBox
 	Friend WithEvents Label14 As System.Windows.Forms.Label
 	Friend WithEvents AutoOpenFpxFileCheckBox As System.Windows.Forms.CheckBox
-	Friend WithEvents Label7 As System.Windows.Forms.Label
 	Friend WithEvents AutoOpenGmaFileCheckBox As System.Windows.Forms.CheckBox
-
+	Friend WithEvents AutoOpenFolderForPackRadioButton As RadioButton
+	Friend WithEvents DragAndDropFolderForPackRadioButton As RadioButton
+	Friend WithEvents AutoOpenVpkPanel As Panel
+	Friend WithEvents AutoOpenVpkFileForPublishRadioButton As RadioButton
+	Friend WithEvents AutoOpenVpkFileForUnpackRadioButton As RadioButton
+	Friend WithEvents Panel2 As Panel
+	Friend WithEvents AutoOpenGmaFileForPublishRadioButton As RadioButton
+	Friend WithEvents AutoOpenGmaFileForUnpackRadioButton As RadioButton
+	Friend WithEvents Panel5 As Panel
+	Friend WithEvents DragAndDropGmaFileForPublishRadioButton As RadioButton
+	Friend WithEvents DragAndDropGmaFileForUnpackRadioButton As RadioButton
+	Friend WithEvents Panel6 As Panel
+	Friend WithEvents DragAndDropVpkFileForPublishRadioButton As RadioButton
+	Friend WithEvents DragAndDropVpkFileForUnpackRadioButton As RadioButton
+	Friend WithEvents Label7 As Label
+	Friend WithEvents Label6 As Label
 End Class

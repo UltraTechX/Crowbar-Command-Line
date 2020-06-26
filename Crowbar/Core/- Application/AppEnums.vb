@@ -8,10 +8,17 @@ Public Module AppEnums
 		<Description("Folder and subfolders")> FolderRecursion
 	End Enum
 
-	Public Enum UnpackOutputPathOptions
-		<Description("Game's addons folder")> GameAddonsFolder
+	Public Enum DownloadOutputPathOptions
+		'<Description("Downloads folder")> DownloadsFolder
+		<Description("Documents folder")> DocumentsFolder
 		<Description("Work folder")> WorkFolder
+	End Enum
+
+	Public Enum UnpackOutputPathOptions
+		<Description("Same folder")> SameFolder
 		<Description("Subfolder (of Package)")> Subfolder
+		<Description("Work folder")> WorkFolder
+		<Description("Game's addons folder")> GameAddonsFolder
 	End Enum
 
 	Public Enum DecompileOutputPathOptions
@@ -25,11 +32,31 @@ Public Module AppEnums
 		<Description("Subfolder (of QC input)")> Subfolder
 	End Enum
 
+	Public Enum PackInputOptions
+		<Description("Folder")> Folder
+		<Description("Parent of child folders")> ParentFolder
+	End Enum
+
+	Public Enum PackOutputPathOptions
+		<Description("Work folder")> WorkFolder
+		<Description("Parent folder")> ParentFolder
+	End Enum
+
+	Public Enum PublishSearchFieldOptions
+		<Description("ID")> ID
+		<Description("Owner")> Owner
+		<Description("Title")> Title
+		<Description("Description")> Description
+		<Description("[All fields]")> AllFields
+	End Enum
+
 	Public Enum StatusMessage
 		<Description("Success")> Success
 		<Description("Error")> [Error]
 		<Description("Canceled")> Canceled
 		<Description("Skipped")> Skipped
+
+		<Description("ErrorUnableToCreateTempFolder")> ErrorUnableToCreateTempFolder
 
 		<Description("ErrorRequiredSequenceGroupMdlFileNotFound")> ErrorRequiredSequenceGroupMdlFileNotFound
 		<Description("ErrorRequiredTextureMdlFileNotFound")> ErrorRequiredTextureMdlFileNotFound
@@ -60,6 +87,7 @@ Public Module AppEnums
 	Public Enum ActionType
 		<Description("Unknown")> Unknown
 		<Description("SetUpGames")> SetUpGames
+		<Description("Download")> Download
 		<Description("Unpack")> Unpack
 		<Description("Preview")> Preview
 		<Description("Decompile")> Decompile
@@ -67,7 +95,7 @@ Public Module AppEnums
 		<Description("Compile")> Compile
 		<Description("View")> View
 		<Description("Pack")> Pack
-		'<Description("Release")> Release
+		<Description("Publish")> Publish
 		'<Description("Options")> Options
 	End Enum
 
